@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Centro Docente</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegacion principal">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">CD</div>
+          <div>
+            <strong>Centro Docente</strong>
+            <span>Copiloto pedagogico</span>
+          </div>
+        </div>
+
+        <nav class="main-nav">
+          <button class="nav-item is-active" data-view="dashboard">
+            <span aria-hidden="true">⌂</span>
+            Inicio
+          </button>
+          <button class="nav-item" data-view="courses">
+            <span aria-hidden="true">▦</span>
+            Cursos
+          </button>
+          <button class="nav-item" data-view="planner">
+            <span aria-hidden="true">□</span>
+            Planificador
+          </button>
+          <button class="nav-item" data-view="library">
+            <span aria-hidden="true">⌕</span>
+            Biblioteca
+          </button>
+          <button class="nav-item" data-view="assistant">
+            <span aria-hidden="true">✦</span>
+            Asistente
+          </button>
+          <button class="nav-item" data-view="settings">
+            <span aria-hidden="true">⚙</span>
+            Configuracion
+          </button>
+        </nav>
+
+        <section class="sync-card" aria-label="Estado de integraciones">
+          <span class="eyebrow">Integraciones</span>
+          <div class="sync-row">
+            <span>OneDrive</span>
+            <strong class="status-ok">Sincronizado</strong>
+          </div>
+          <div class="sync-row">
+            <span>Canvas</span>
+            <strong class="status-warn">Pendiente</strong>
+          </div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <button class="icon-button mobile-menu" id="menuToggle" aria-label="Abrir navegacion">☰</button>
+          <label class="global-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="globalSearch" type="search" placeholder="Buscar guia, SIMCE, mito, abril..." />
+          </label>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="newResourceBtn">Nuevo recurso</button>
+            <button class="primary-button" id="newClassBtn">Nueva clase</button>
+          </div>
+        </header>
+
+        <section class="view is-visible" id="dashboard" aria-labelledby="dashboard-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Hoy</span>
+              <h1 id="dashboard-title">Trabajo docente organizado por clase</h1>
+            </div>
+            <div class="date-pill">Semana del 27 de abril, 2026</div>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel today-panel">
+              <div class="panel-heading">
+                <h2>Clases de hoy</h2>
+                <button class="text-button" data-view-target="planner">Ver planificador</button>
+              </div>
+              <div id="todayClasses" class="stack-list"></div>
+            </section>
+
+            <section class="panel ai-panel">
+              <div class="panel-heading">
+                <h2>Modo inteligente</h2>
+                <span class="mini-badge">Borrador IA</span>
+              </div>
+              <div class="quick-ai">
+                <button data-prompt="objetivo">Crear objetivo</button>
+                <button data-prompt="actividad">Actividad inicio-desarrollo-cierre</button>
+                <button data-prompt="simce">Preguntas SIMCE</button>
+              </div>
+              <div class="assistant-preview" id="quickAiOutput">
+                Selecciona una accion para preparar material guardable en una clase.
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Proximas clases</h2>
+                <span class="muted" id="upcomingCount"></span>
+              </div>
+              <div id="upcomingClasses" class="stack-list compact"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Reutilizacion sugerida</h2>
+                <button class="text-button" data-view-target="library">Explorar</button>
+              </div>
+              <div id="reuseSuggestions" class="stack-list compact"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="courses" aria-labelledby="courses-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Centro de cursos</span>
+              <h1 id="courses-title">Cursos pedagogicos</h1>
+            </div>
+            <button class="primary-button" id="addCourseBtn">Crear curso</button>
+          </div>
+          <div id="courseGrid" class="course-grid"></div>
+          <section class="panel course-detail" id="courseDetail"></section>
+        </section>
+
+        <section class="view" id="planner" aria-labelledby="planner-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Año → unidad → semana → clase</span>
+              <h1 id="planner-title">Planificador de clases</h1>
+            </div>
+            <div class="segmented" role="tablist" aria-label="Vista del planificador">
+              <button class="is-active" data-planner-view="week">Semana</button>
+              <button data-planner-view="unit">Unidad</button>
+              <button data-planner-view="year">Año</button>
+            </div>
+          </div>
+
+          <div class="planner-layout">
+            <aside class="filter-panel">
+              <label>
+                Curso
+                <select id="plannerCourseFilter"></select>
+              </label>
+              <label>
+                Estado
+                <select id="plannerStatusFilter">
+                  <option value="all">Todos</option>
+                  <option value="planned">Planificadas</option>
+                  <option value="done">Realizadas</option>
+                  <option value="in_progress">En progreso</option>
+                </select>
+              </label>
+              <label>
+                Unidad
+                <select id="plannerUnitFilter"></select>
+              </label>
+            </aside>
+            <div class="planner-list" id="plannerList"></div>
+          </div>
+        </section>
+
+        <section class="view" id="class-detail" aria-labelledby="class-title">
+          <button class="back-button" data-view-target="planner">← Volver al planificador</button>
+          <div id="classDetailContent"></div>
+        </section>
+
+        <section class="view" id="library" aria-labelledby="library-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Biblioteca unica</span>
+              <h1 id="library-title">Recursos reutilizables</h1>
+            </div>
+            <button class="primary-button" id="addResourceBtn">Agregar recurso</button>
+          </div>
+
+          <section class="panel integration-panel">
+            <div>
+              <span class="eyebrow">Integracion OneDrive</span>
+              <h2>Buscar e importar archivos desde Microsoft Graph</h2>
+              <p class="muted" id="oneDriveStatusText">Configura el Client ID para conectar una cuenta real.</p>
+            </div>
+            <div class="onedrive-tools">
+              <button class="ghost-button" id="oneDriveConnectBtn">Conectar OneDrive</button>
+              <label class="onedrive-search">
+                <span aria-hidden="true">⌕</span>
+                <input id="oneDriveSearchInput" type="search" placeholder="Buscar guia, PPT, SIMCE..." />
+              </label>
+              <button class="primary-button" id="oneDriveSearchBtn">Buscar</button>
+            </div>
+            <div class="onedrive-results" id="oneDriveResults"></div>
+          </section>
+
+          <div class="library-layout">
+            <aside class="filter-panel">
+              <label>
+                Curso
+                <select id="resourceCourseFilter"></select>
+              </label>
+              <label>
+                Tipo
+                <select id="resourceTypeFilter"></select>
+              </label>
+              <label>
+                Fuente
+                <select id="resourceSourceFilter"></select>
+              </label>
+              <label>
+                Uso
+                <select id="resourceUsageFilter">
+                  <option value="all">Todos</option>
+                  <option value="used">Ya usado</option>
+                  <option value="unused">No usado</option>
+                  <option value="recommended">Recomendado para reutilizar</option>
+                </select>
+              </label>
+            </aside>
+            <div>
+              <div class="result-summary" id="resourceSummary"></div>
+              <div id="resourceList" class="resource-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="assistant" aria-labelledby="assistant-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Modo inteligente</span>
+              <h1 id="assistant-title">Asistente docente</h1>
+            </div>
+          </div>
+
+          <div class="assistant-layout">
+            <form class="panel assistant-form" id="assistantForm">
+              <label>
+                Curso
+                <select id="assistantCourse"></select>
+              </label>
+              <label>
+                Tipo de salida
+                <select id="assistantType">
+                  <option value="objective">Objetivo de clase</option>
+                  <option value="activity">Inicio, desarrollo y cierre</option>
+                  <option value="simce">Preguntas tipo SIMCE</option>
+                  <option value="ticket">Ticket de salida</option>
+                  <option value="rubric">Rubrica breve</option>
+                </select>
+              </label>
+              <label>
+                Tema o necesidad
+                <textarea id="assistantTopic" rows="5" placeholder="Ej: comprension lectora, inferencias, mitos y leyendas..."></textarea>
+              </label>
+              <div class="form-row">
+                <label>
+                  Duracion
+                  <select id="assistantDuration">
+                    <option>45 min</option>
+                    <option>60 min</option>
+                    <option>90 min</option>
+                  </select>
+                </label>
+                <label>
+                  Dificultad
+                  <select id="assistantDifficulty">
+                    <option>Media</option>
+                    <option>Baja</option>
+                    <option>Alta</option>
+                  </select>
+                </label>
+              </div>
+              <button class="primary-button" type="submit">Generar propuesta</button>
+            </form>
+            <section class="panel assistant-output">
+              <div class="panel-heading">
+                <h2>Resultado guardable</h2>
+                <button class="ghost-button" id="saveGeneratedBtn">Guardar en banco</button>
+              </div>
+              <div id="assistantOutput" class="generated-output">
+                Completa el formulario para crear una propuesta lista para ajustar y guardar.
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="settings" aria-labelledby="settings-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Configuracion</span>
+              <h1 id="settings-title">Workspace e integraciones</h1>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <section class="panel">
+              <h2>Taxonomia minima</h2>
+              <div class="tag-cloud" id="tagCloud"></div>
+            </section>
+            <section class="panel">
+              <h2>Conectores</h2>
+              <div class="connector-row">
+                <div>
+                  <strong>Microsoft OneDrive</strong>
+                  <span id="oneDriveSettingsStatus">Preparado para OAuth con Microsoft Graph.</span>
+                </div>
+                <button class="ghost-button" id="saveOneDriveConfigBtn">Guardar</button>
+              </div>
+              <div class="connector-config">
+                <label>
+                  Azure Client ID
+                  <input id="oneDriveClientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                </label>
+                <label>
+                  Tenant
+                  <input id="oneDriveTenantId" placeholder="common" value="common" />
+                </label>
+                <label>
+                  Redirect URI
+                  <input id="oneDriveRedirectUri" />
+                </label>
+              </div>
+              <div class="connector-row">
+                <div>
+                  <strong>Canvas LMS</strong>
+                  <span>Listo para API o herramienta externa LTI.</span>
+                </div>
+                <button class="ghost-button">Conectar</button>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="modal" id="classModal">
+      <form method="dialog" class="modal-content" id="classForm">
+        <div class="panel-heading">
+          <h2>Nueva clase</h2>
+          <button class="icon-button" value="cancel" aria-label="Cerrar">×</button>
+        </div>
+        <label>
+          Titulo
+          <input id="classTitleInput" required placeholder="Clase 5 - Inferencias" />
+        </label>
+        <div class="form-row">
+          <label>
+            Curso
+            <select id="classCourseInput"></select>
+          </label>
+          <label>
+            Fecha
+            <input id="classDateInput" type="date" required />
+          </label>
+        </div>
+        <label>
+          Objetivo
+          <textarea id="classObjectiveInput" rows="4" placeholder="Los estudiantes seran capaces de..."></textarea>
+        </label>
+        <button class="primary-button" value="default" type="submit">Guardar clase</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="courseModal">
+      <form method="dialog" class="modal-content" id="courseForm">
+        <div class="panel-heading">
+          <h2>Nuevo curso</h2>
+          <button class="icon-button" value="cancel" aria-label="Cerrar">×</button>
+        </div>
+        <label>
+          Nombre
+          <input id="courseNameInput" required placeholder="4° Basico A" />
+        </label>
+        <div class="form-row">
+          <label>
+            Nivel
+            <input id="courseLevelInput" required placeholder="4° Basico" />
+          </label>
+          <label>
+            Año
+            <input id="courseYearInput" type="number" min="2020" value="2026" required />
+          </label>
+        </div>
+        <label>
+          Asignatura
+          <input id="courseSubjectInput" required value="Lenguaje" />
+        </label>
+        <button class="primary-button" value="default" type="submit">Guardar curso</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="resourceModal">
+      <form method="dialog" class="modal-content" id="resourceForm">
+        <div class="panel-heading">
+          <h2>Nuevo recurso</h2>
+          <button class="icon-button" value="cancel" aria-label="Cerrar">×</button>
+        </div>
+        <label>
+          Titulo
+          <input id="resourceTitleInput" required placeholder="Guia de comprension lectora" />
+        </label>
+        <div class="form-row">
+          <label>
+            Tipo
+            <select id="resourceTypeInput">
+              <option value="guide">Guia</option>
+              <option value="ppt">PPT</option>
+              <option value="assessment">Evaluacion</option>
+              <option value="simce">SIMCE</option>
+              <option value="document">Documento</option>
+            </select>
+          </label>
+          <label>
+            Fuente
+            <select id="resourceSourceInput">
+              <option value="onedrive">OneDrive</option>
+              <option value="canvas">Canvas</option>
+              <option value="local">Local</option>
+              <option value="generated">Generado</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Descripcion
+          <textarea id="resourceDescriptionInput" rows="3"></textarea>
+        </label>
+        <button class="primary-button" value="default" type="submit">Guardar recurso</button>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
