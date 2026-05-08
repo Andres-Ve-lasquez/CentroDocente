@@ -33,6 +33,26 @@ const initialCourses = [
     color: "#f0a926",
     canvasId: null,
     active: true
+  },
+  {
+    id: "c4",
+    name: "6 Basico",
+    level: "6 Basico",
+    subject: "Lenguaje",
+    year: 2026,
+    color: "#ee5d78",
+    canvasId: null,
+    active: true
+  },
+  {
+    id: "c5",
+    name: "8 Basico",
+    level: "8 Basico",
+    subject: "Lenguaje",
+    year: 2026,
+    color: "#7b61ff",
+    canvasId: null,
+    active: true
   }
 ];
 
@@ -40,7 +60,9 @@ const initialUnits = [
   { id: "u1", courseId: "c1", title: "Unidad 1: Comprension lectora", order: 1 },
   { id: "u2", courseId: "c1", title: "Unidad 2: Textos no literarios", order: 2 },
   { id: "u3", courseId: "c2", title: "Unidad 1: Inferencias", order: 1 },
-  { id: "u4", courseId: "c3", title: "Unidad 1: Mitos y leyendas", order: 1 }
+  { id: "u4", courseId: "c3", title: "Unidad 1: Mitos y leyendas", order: 1 },
+  { id: "u5", courseId: "c4", title: "Unidad 1: Textos informativos", order: 1 },
+  { id: "u6", courseId: "c5", title: "Unidad 1: Experiencia humana y literatura", order: 1 }
 ];
 
 const initialClasses = [

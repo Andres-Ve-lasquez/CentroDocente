@@ -12,7 +12,8 @@
     "prisma:validate": "prisma validate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:seed:curriculum": "node scripts/seed-curriculum.mjs"
+    "db:seed:curriculum": "node scripts/seed-curriculum.mjs",
+    "curriculum:import:official": "node scripts/import-curriculum-from-official.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

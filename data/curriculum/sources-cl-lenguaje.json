@@ -1,0 +1,32 @@
+[
+  {
+    "level": "4 Basico",
+    "subject": "Lenguaje",
+    "officialSubject": "Lenguaje y Comunicación",
+    "baseUrl": "https://www.curriculumnacional.cl/curriculum/1o-6o-basico/lenguaje-comunicacion/4-basico"
+  },
+  {
+    "level": "5 Basico",
+    "subject": "Lenguaje",
+    "officialSubject": "Lenguaje y Comunicación",
+    "baseUrl": "https://www.curriculumnacional.cl/curriculum/1o-6o-basico/lenguaje-comunicacion/5-basico"
+  },
+  {
+    "level": "6 Basico",
+    "subject": "Lenguaje",
+    "officialSubject": "Lenguaje y Comunicación",
+    "baseUrl": "https://www.curriculumnacional.cl/curriculum/1o-6o-basico/lenguaje-comunicacion/6-basico"
+  },
+  {
+    "level": "7 Basico",
+    "subject": "Lenguaje",
+    "officialSubject": "Lengua y Literatura",
+    "baseUrl": "https://www.curriculumnacional.cl/curriculum/7o-basico-2o-medio/lengua-literatura/7-basico"
+  },
+  {
+    "level": "8 Basico",
+    "subject": "Lenguaje",
+    "officialSubject": "Lengua y Literatura",
+    "baseUrl": "https://www.curriculumnacional.cl/curriculum/7o-basico-2o-medio/lengua-literatura/8-basico"
+  }
+]
