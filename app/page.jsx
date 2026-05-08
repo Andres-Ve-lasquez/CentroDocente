@@ -332,6 +332,7 @@ export default function HomePage() {
   const [activeView, setActiveView] = useState("dashboard");
   const [activeCourseId, setActiveCourseId] = useState("c1");
   const [activeClassId, setActiveClassId] = useState("cl2");
+  const [activeCourseUnitCode, setActiveCourseUnitCode] = useState("LE04 U1");
   const [courses, setCourses] = useState(initialCourses);
   const [units, setUnits] = useState(initialUnits);
   const [classes, setClasses] = useState(initialClasses);
@@ -385,6 +386,9 @@ export default function HomePage() {
   const activeClass = classes.find((item) => item.id === activeClassId) ?? classes[0];
   const activeClassObjective = objectiveByCode(activeClass?.objectiveCode);
   const activeClassCurriculumUnit = curriculumUnitByCode(activeClass?.curriculumUnitCode);
+  const activeCourseUnits = curriculumUnitsForCourse(activeCourse);
+  const selectedCourseUnit = curriculumUnitByCode(activeCourseUnitCode) ?? activeCourseUnits[0];
+  const selectedCourseUnitObjectives = objectivesForUnit(activeCourse, selectedCourseUnit?.code);
 
   function showToast(message) {
     setToast(message);
@@ -836,6 +840,7 @@ export default function HomePage() {
                         className="ghost-button"
                         onClick={() => {
                           setActiveCourseId(course.id);
+                          setActiveCourseUnitCode(curriculumUnitsForCourse(course)[0]?.code ?? "");
                           showToast("Curso seleccionado.");
                         }}
                       >
@@ -847,6 +852,7 @@ export default function HomePage() {
                           const id = `c-${Date.now()}`;
                           setCourses((items) => [...items, { ...course, id, name: `${course.name} copia`, canvasId: null }]);
                           setActiveCourseId(id);
+                          setActiveCourseUnitCode(curriculumUnitsForCourse(course)[0]?.code ?? "");
                           showToast("Curso duplicado.");
                         }}
                       >
@@ -880,42 +886,56 @@ export default function HomePage() {
                   Planificar
                 </button>
               </div>
-              <div className="dashboard-grid">
+              <div className="course-curriculum-layout">
                 <div>
-                  <h3>Unidades</h3>
-                  <div className="stack-list compact">
-                    {units
-                      .filter((unit) => unit.courseId === activeCourse?.id)
-                      .map((unit) => (
-                        <article className="class-card" key={unit.id}>
-                          <div>
-                            <strong>{unit.title}</strong>
-                            <div className="card-meta">
-                              <span>{classes.filter((item) => item.unitId === unit.id).length} clases</span>
-                              <span>{resources.filter((item) => item.unitId === unit.id).length} recursos</span>
-                            </div>
-                          </div>
-                        </article>
-                      ))}
+                  <div className="panel-heading">
+                    <h3>Unidades del programa</h3>
+                    <span className="mini-badge">{activeCourseUnits.length} unidades</span>
+                  </div>
+                  <div className="unit-selector-list">
+                    {activeCourseUnits.map((unit) => (
+                      <button
+                        className={`unit-selector ${selectedCourseUnit?.code === unit.code ? "is-active" : ""}`}
+                        key={unit.code}
+                        onClick={() => setActiveCourseUnitCode(unit.code)}
+                      >
+                        <span>{unit.code}</span>
+                        <strong>{unit.title}</strong>
+                        <small>{unit.objectiveCodes.length} OA vinculados</small>
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div>
-                  <h3>Objetivos curriculares asociados</h3>
+                  <div className="panel-heading">
+                    <div>
+                      <h3>{selectedCourseUnit?.title ?? "Selecciona una unidad"}</h3>
+                      <p className="muted">{selectedCourseUnit?.description}</p>
+                    </div>
+                    {selectedCourseUnit?.sourceUrl && (
+                      <a className="ghost-button" href={selectedCourseUnit.sourceUrl} target="_blank" rel="noreferrer">
+                        Ver programa
+                      </a>
+                    )}
+                  </div>
                   <div className="stack-list compact">
-                    {objectivesForCourse(activeCourse)
-                      .map((objective) => (
-                        <article className="class-card" key={objective.code}>
-                          <div>
-                            <strong>
-                              {objective.code} · {objective.title}
-                            </strong>
-                            <p className="muted">{objective.description}</p>
-                            <a className="text-link" href={objective.sourceUrl} target="_blank" rel="noreferrer">
-                              Ver fuente oficial
-                            </a>
+                    {selectedCourseUnitObjectives.map((objective) => (
+                      <article className="class-card" key={objective.code}>
+                        <div>
+                          <strong>
+                            {objective.code} · {objective.title}
+                          </strong>
+                          <p className="muted">{objective.description}</p>
+                          <div className="card-meta">
+                            <span>{objective.axis}</span>
+                            <span>{objective.skills || "habilidades por definir"}</span>
                           </div>
-                        </article>
-                      ))}
+                          <a className="text-link" href={objective.sourceUrl} target="_blank" rel="noreferrer">
+                            Ver fuente oficial
+                          </a>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 </div>
               </div>
