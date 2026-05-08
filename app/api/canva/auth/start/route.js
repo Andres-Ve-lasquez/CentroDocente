@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { buildCanvaAuthorizationUrl, createPkcePair } from "../../../../../lib/canva";
 
@@ -7,16 +6,16 @@ export async function GET() {
   try {
     const { verifier, challenge } = createPkcePair();
     const state = crypto.randomBytes(24).toString("hex");
-    const cookieStore = await cookies();
+    const response = NextResponse.redirect(buildCanvaAuthorizationUrl({ challenge, state }));
 
-    cookieStore.set("canva_pkce_verifier", verifier, {
+    response.cookies.set("canva_pkce_verifier", verifier, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 600
     });
-    cookieStore.set("canva_oauth_state", state, {
+    response.cookies.set("canva_oauth_state", state, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -24,7 +23,7 @@ export async function GET() {
       maxAge: 600
     });
 
-    return NextResponse.redirect(buildCanvaAuthorizationUrl({ challenge, state }));
+    return response;
   } catch (error) {
     return NextResponse.json(
       {
