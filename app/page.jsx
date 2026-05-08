@@ -221,13 +221,13 @@ const labels = {
   canva: "Canva"
 };
 
-const views = [
-  ["dashboard", "Inicio", "⌂"],
-  ["courses", "Cursos", "▦"],
-  ["planner", "Planificador", "□"],
-  ["library", "Biblioteca", "⌕"],
-  ["assistant", "Asistente", "✦"],
-  ["settings", "Configuracion", "⚙"]
+const navViews = [
+  ["dashboard", "Inicio", "IN"],
+  ["courses", "Cursos", "CU"],
+  ["planner", "Planificador", "PL"],
+  ["library", "Biblioteca", "BI"],
+  ["assistant", "Asistente", "IA"],
+  ["settings", "Configuracion", "CO"]
 ];
 
 function normalize(value) {
@@ -838,7 +838,7 @@ export default function HomePage() {
         </div>
 
         <nav className="main-nav">
-          {views.map(([id, label, icon]) => (
+          {navViews.map(([id, label, icon]) => (
             <button
               className={`nav-item ${activeView === id ? "is-active" : ""}`}
               data-view={id}
