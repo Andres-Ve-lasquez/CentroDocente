@@ -480,6 +480,73 @@ h3 {
   align-items: start;
 }
 
+.library-command {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.1fr) minmax(360px, 0.9fr);
+  gap: 16px;
+  margin-bottom: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(232, 246, 255, 0.92) 55%, rgba(255, 246, 222, 0.9)),
+    var(--surface);
+}
+
+.library-search-main {
+  grid-row: span 2;
+}
+
+.search-field {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(40, 120, 224, 0.24);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0 14px;
+  box-shadow: 0 14px 32px rgba(40, 120, 224, 0.1);
+}
+
+.search-field span {
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.search-field input {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-left: 0;
+}
+
+.search-field input:focus {
+  box-shadow: none;
+}
+
+.library-date-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.canva-library-strip {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(123, 97, 255, 0.18);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: rgba(250, 247, 255, 0.82);
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(160px, 0.7fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.canva-library-strip span {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 0.88rem;
+}
+
 .filter-panel {
   position: sticky;
   top: 96px;
@@ -489,6 +556,13 @@ h3 {
   background: rgba(255, 255, 255, 0.9);
   display: grid;
   gap: 13px;
+}
+
+.filter-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 label {
@@ -553,6 +627,22 @@ textarea:focus {
   gap: 12px;
 }
 
+.resource-card.canva-resource-card {
+  grid-template-columns: 150px minmax(0, 1fr) auto;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(247, 243, 255, 0.92)),
+    var(--surface);
+}
+
+.resource-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
 .integration-panel {
   margin-bottom: 18px;
   display: grid;
@@ -612,8 +702,20 @@ textarea:focus {
 }
 
 .source-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
   color: #ffffff;
   background: var(--mint);
+}
+
+.source-pill.canva {
+  background: linear-gradient(135deg, #00c4cc, #7d2ae8);
 }
 
 .source-pill.canvas {
@@ -629,9 +731,17 @@ textarea:focus {
 }
 
 .result-summary {
-  color: var(--muted);
+  color: var(--ink);
   margin-bottom: 12px;
   font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.result-summary span {
+  color: var(--muted);
 }
 
 .assistant-layout,
@@ -853,6 +963,8 @@ textarea:focus {
   .settings-grid,
   .class-detail-layout,
   .course-curriculum-layout,
+  .library-command,
+  .canva-library-strip,
   .canvas-data-grid,
   .canva-design-grid {
     grid-template-columns: 1fr;
@@ -912,7 +1024,9 @@ textarea:focus {
 
   .planner-layout,
   .library-layout,
-  .integration-panel {
+  .integration-panel,
+  .library-date-filters,
+  .resource-card.canva-resource-card {
     grid-template-columns: 1fr;
   }
 

@@ -217,7 +217,8 @@ const labels = {
   canvas: "Canvas",
   local: "Local",
   uploaded: "Subido",
-  generated: "Generado"
+  generated: "Generado",
+  canva: "Canva"
 };
 
 const views = [
@@ -242,6 +243,21 @@ function formatDate(value) {
     day: "numeric",
     month: "short"
   }).format(new Date(`${value}T12:00:00`));
+}
+
+function formatDateTime(value) {
+  if (!value) return "Sin fecha";
+  const date = typeof value === "number" ? new Date(value * 1000) : new Date(`${value}T12:00:00`);
+  return new Intl.DateTimeFormat("es-CL", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(date);
+}
+
+function dateKeyFromCanvaTimestamp(value) {
+  if (!value) return "";
+  return new Date(value * 1000).toISOString().slice(0, 10);
 }
 
 function formatMonthDay(value) {
@@ -345,6 +361,10 @@ export default function HomePage() {
   const [resourceType, setResourceType] = useState("all");
   const [resourceSource, setResourceSource] = useState("all");
   const [resourceUsage, setResourceUsage] = useState("all");
+  const [libraryTitleQuery, setLibraryTitleQuery] = useState("");
+  const [libraryDateFrom, setLibraryDateFrom] = useState("");
+  const [libraryDateTo, setLibraryDateTo] = useState("");
+  const [librarySort, setLibrarySort] = useState("date_desc");
   const [quickAi, setQuickAi] = useState("Selecciona una accion para preparar material guardable en una clase.");
   const [assistantOutput, setAssistantOutput] = useState(
     "Completa el formulario para crear una propuesta lista para ajustar y guardar."
@@ -370,6 +390,8 @@ export default function HomePage() {
   });
   const [canvaStatus, setCanvaStatus] = useState("Canva no conectado");
   const [canvaQuery, setCanvaQuery] = useState("");
+  const [canvaOwnership, setCanvaOwnership] = useState("any");
+  const [canvaSortBy, setCanvaSortBy] = useState("modified_descending");
   const [canvaDesigns, setCanvaDesigns] = useState([]);
   const [toast, setToast] = useState("");
   const [draftClass, setDraftClass] = useState({
@@ -563,6 +585,31 @@ export default function HomePage() {
     showToast("Archivo importado como recurso reutilizable.");
   }
 
+  function importCanvaDesign(design) {
+    setResources((items) => [
+      {
+        id: `r-${Date.now()}`,
+        title: design.title || "Diseno Canva sin titulo",
+        description: "Diseno importado desde Canva. Se guarda como recurso reutilizable con enlace de edicion.",
+        type: "document",
+        source: "canva",
+        courseId: activeCourseId,
+        unitId: null,
+        classId: null,
+        level: activeCourse?.level ?? "Sin nivel",
+        tags: ["canva", "diseno"],
+        date: dateKeyFromCanvaTimestamp(design.updated_at) || new Date().toISOString().slice(0, 10),
+        usedCount: 0,
+        reusable: true,
+        recommended: true,
+        url: design.urls?.edit_url || design.urls?.view_url || "#",
+        externalId: design.id
+      },
+      ...items
+    ]);
+    showToast("Proyecto Canva agregado a Biblioteca.");
+  }
+
   function generateAssistant(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -664,10 +711,12 @@ export default function HomePage() {
     setCanvaStatus("Cargando proyectos de Canva...");
     try {
       const params = new URLSearchParams({
-        limit: "24",
-        sort_by: "modified_descending"
+        limit: "50",
+        ownership: canvaOwnership,
+        sort_by: canvaSortBy
       });
-      if (canvaQuery.trim()) params.set("query", canvaQuery.trim());
+      const query = canvaQuery.trim() || libraryTitleQuery.trim();
+      if (query) params.set("query", query);
       const response = await fetch(`/api/canva/designs?${params}`);
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.message || "No se pudieron cargar proyectos Canva");
@@ -695,30 +744,82 @@ export default function HomePage() {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [classes, plannerCourse, plannerStatus, plannerUnit]);
 
+  const canvaLibraryItems = useMemo(
+    () =>
+      canvaDesigns.map((design) => ({
+        id: `canva-${design.id}`,
+        title: design.title || "Diseno Canva sin titulo",
+        description: "Proyecto de Canva conectado por API. Puedes abrirlo, editarlo o guardarlo como recurso.",
+        type: "document",
+        source: "canva",
+        courseId: null,
+        unitId: null,
+        classId: null,
+        level: "Canva",
+        tags: ["canva", design.page_count ? `${design.page_count} paginas` : "proyecto"],
+        date: dateKeyFromCanvaTimestamp(design.updated_at),
+        createdDate: dateKeyFromCanvaTimestamp(design.created_at),
+        usedCount: 0,
+        reusable: true,
+        recommended: true,
+        url: design.urls?.edit_url || design.urls?.view_url || "#",
+        externalId: design.id,
+        canvaDesign: design
+      })),
+    [canvaDesigns]
+  );
+
   const filteredResources = useMemo(() => {
-    const query = normalize(globalSearch);
-    return resources
+    const query = normalize([globalSearch, libraryTitleQuery].filter(Boolean).join(" "));
+    return [...resources, ...canvaLibraryItems]
       .filter((resource) => {
         if (!query) return true;
         const text = normalize(
-          [resource.title, resource.description, resource.level, labels[resource.type], resource.tags.join(" ")].join(" ")
+          [
+            resource.title,
+            resource.description,
+            resource.level,
+            labels[resource.type],
+            labels[resource.source],
+            resource.tags.join(" ")
+          ].join(" ")
         );
         return query.split(/\s+/).every((part) => text.includes(part));
       })
       .filter((resource) => resourceCourse === "all" || resource.courseId === resourceCourse)
       .filter((resource) => resourceType === "all" || resource.type === resourceType)
       .filter((resource) => resourceSource === "all" || resource.source === resourceSource)
+      .filter((resource) => !libraryDateFrom || resource.date >= libraryDateFrom)
+      .filter((resource) => !libraryDateTo || resource.date <= libraryDateTo)
       .filter((resource) => {
         if (resourceUsage === "used") return resource.usedCount > 0;
         if (resourceUsage === "unused") return resource.usedCount === 0;
         if (resourceUsage === "recommended") return resource.recommended;
         return true;
+      })
+      .sort((a, b) => {
+        if (librarySort === "title_asc") return a.title.localeCompare(b.title);
+        if (librarySort === "title_desc") return b.title.localeCompare(a.title);
+        if (librarySort === "date_asc") return (a.date || "").localeCompare(b.date || "");
+        return (b.date || "").localeCompare(a.date || "");
       });
-  }, [globalSearch, resourceCourse, resourceSource, resourceType, resourceUsage, resources]);
+  }, [
+    canvaLibraryItems,
+    globalSearch,
+    libraryDateFrom,
+    libraryDateTo,
+    librarySort,
+    libraryTitleQuery,
+    resourceCourse,
+    resourceSource,
+    resourceType,
+    resourceUsage,
+    resources
+  ]);
 
   const allTags = [...new Set(resources.flatMap((resource) => resource.tags))];
   const resourceTypes = [...new Set(resources.map((resource) => resource.type))];
-  const resourceSources = [...new Set(resources.map((resource) => resource.source))];
+  const resourceSources = [...new Set([...resources, ...canvaLibraryItems].map((resource) => resource.source))];
 
   return (
     <div className="app-shell">
@@ -1297,14 +1398,96 @@ export default function HomePage() {
                 <span className="eyebrow">Biblioteca unica</span>
                 <h1>Recursos reutilizables</h1>
               </div>
+              <div className="connector-actions">
+                <button className="ghost-button" onClick={() => window.location.assign("/api/canva/auth/start")}>
+                  Conectar Canva
+                </button>
+                <button className="primary-button" onClick={loadCanvaDesigns}>
+                  Cargar Canva
+                </button>
+              </div>
             </div>
+
+            <section className="panel library-command">
+              <div className="library-search-main">
+                <label>
+                  Buscar por titulo o palabra clave
+                  <div className="search-field">
+                    <span aria-hidden="true">⌕</span>
+                    <input
+                      type="search"
+                      value={libraryTitleQuery}
+                      onChange={(event) => {
+                        setLibraryTitleQuery(event.target.value);
+                        setCanvaQuery(event.target.value);
+                      }}
+                      placeholder="Ej: diploma, guia de inferencias, SIMCE, mitos..."
+                    />
+                  </div>
+                </label>
+              </div>
+              <div className="library-date-filters">
+                <label>
+                  Desde
+                  <input
+                    type="date"
+                    value={libraryDateFrom}
+                    onChange={(event) => setLibraryDateFrom(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Hasta
+                  <input
+                    type="date"
+                    value={libraryDateTo}
+                    onChange={(event) => setLibraryDateTo(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Orden
+                  <select value={librarySort} onChange={(event) => setLibrarySort(event.target.value)}>
+                    <option value="date_desc">Mas recientes</option>
+                    <option value="date_asc">Mas antiguos</option>
+                    <option value="title_asc">Titulo A-Z</option>
+                    <option value="title_desc">Titulo Z-A</option>
+                  </select>
+                </label>
+              </div>
+              <div className="canva-library-strip">
+                <div>
+                  <strong>Canva en Biblioteca</strong>
+                  <span>{canvaStatus}</span>
+                </div>
+                <label>
+                  Propiedad
+                  <select value={canvaOwnership} onChange={(event) => setCanvaOwnership(event.target.value)}>
+                    <option value="any">Propios y compartidos</option>
+                    <option value="owned">Solo propios</option>
+                    <option value="shared">Compartidos</option>
+                  </select>
+                </label>
+                <label>
+                  Orden Canva
+                  <select value={canvaSortBy} onChange={(event) => setCanvaSortBy(event.target.value)}>
+                    <option value="modified_descending">Modificados recientes</option>
+                    <option value="modified_ascending">Modificados antiguos</option>
+                    <option value="title_ascending">Titulo A-Z</option>
+                    <option value="title_descending">Titulo Z-A</option>
+                    <option value="relevance">Relevancia</option>
+                  </select>
+                </label>
+                <button className="primary-button" onClick={loadCanvaDesigns}>
+                  Buscar en Canva
+                </button>
+              </div>
+            </section>
 
             <section className="panel integration-panel">
               <div>
-                <span className="eyebrow">Integracion OneDrive</span>
-                <h2>Buscar e importar archivos desde Microsoft Graph</h2>
+                <span className="eyebrow">Importar</span>
+                <h2>Traer archivos externos a la biblioteca</h2>
                 <p className="muted">
-                  En esta migracion queda listo el flujo. El siguiente paso es mover OAuth a API routes con tokens seguros.
+                  OneDrive queda como busqueda demo mientras cerramos OAuth de Microsoft Graph. Canva ya usa la conexion real.
                 </p>
               </div>
               <div className="onedrive-tools">
@@ -1315,7 +1498,7 @@ export default function HomePage() {
                     showToast(oneDriveConfig.clientId ? "OneDrive preparado para OAuth." : "Modo demo OneDrive activo.");
                   }}
                 >
-                  Conectar OneDrive
+                  OneDrive
                 </button>
                 <label className="onedrive-search">
                   <span aria-hidden="true">⌕</span>
@@ -1379,6 +1562,7 @@ export default function HomePage() {
                     onChange={(event) => setDraftResource({ ...draftResource, source: event.target.value })}
                   >
                     <option value="onedrive">OneDrive</option>
+                    <option value="canva">Canva</option>
                     <option value="canvas">Canvas</option>
                     <option value="local">Local</option>
                     <option value="generated">Generado</option>
@@ -1400,6 +1584,24 @@ export default function HomePage() {
 
             <div className="library-layout">
               <aside className="filter-panel">
+                <div className="filter-heading">
+                  <strong>Filtros</strong>
+                  <button
+                    className="text-button"
+                    onClick={() => {
+                      setResourceCourse("all");
+                      setResourceType("all");
+                      setResourceSource("all");
+                      setResourceUsage("all");
+                      setLibraryDateFrom("");
+                      setLibraryDateTo("");
+                      setLibraryTitleQuery("");
+                      setGlobalSearch("");
+                    }}
+                  >
+                    Limpiar
+                  </button>
+                </div>
                 <label>
                   Curso
                   <select value={resourceCourse} onChange={(event) => setResourceCourse(event.target.value)}>
@@ -1444,13 +1646,19 @@ export default function HomePage() {
                 </label>
               </aside>
               <div>
-                <div className="result-summary">{filteredResources.length} recursos encontrados</div>
+                <div className="result-summary">
+                  <strong>{filteredResources.length} recursos encontrados</strong>
+                  <span>
+                    {canvaDesigns.length} desde Canva · {resources.length} guardados en la app
+                  </span>
+                </div>
                 <div className="resource-list">
                   {filteredResources.map((resource) => (
                     <ResourceCard
                       resource={resource}
                       course={courseById(resource.courseId)}
                       classItem={classes.find((item) => item.id === resource.classId)}
+                      onImportCanva={importCanvaDesign}
                       key={resource.id}
                     />
                   ))}
@@ -1839,10 +2047,14 @@ function ResourceMini({ resource }) {
   );
 }
 
-function ResourceCard({ resource, course, classItem }) {
+function ResourceCard({ resource, course, classItem, onImportCanva }) {
   const sourceClass = `source-pill ${resource.source}`;
+  const isCanvaLiveResult = Boolean(resource.canvaDesign);
   return (
-    <article className="resource-card">
+    <article className={`resource-card ${isCanvaLiveResult ? "canva-resource-card" : ""}`}>
+      {resource.canvaDesign?.thumbnail?.url && (
+        <img src={resource.canvaDesign.thumbnail.url} alt="" className="resource-thumb" />
+      )}
       <div>
         <div className="panel-heading">
           <h3>{resource.title}</h3>
@@ -1852,6 +2064,7 @@ function ResourceCard({ resource, course, classItem }) {
         <div className="card-meta">
           <span>{labels[resource.type]}</span>
           <span>{resource.level}</span>
+          <span>{formatDateTime(resource.date)}</span>
           <span>{course?.name ?? "Sin curso"}</span>
           <span>{classItem ? `Usado en: ${classItem.title}` : "No usado"}</span>
           <span>{resource.recommended ? "Recomendado para reutilizar" : "Uso normal"}</span>
@@ -1865,7 +2078,20 @@ function ResourceCard({ resource, course, classItem }) {
         </div>
       </div>
       <div className="resource-actions">
-        <button className="ghost-button">{resource.source === "canvas" ? "Abrir en Canvas" : "Abrir recurso"}</button>
+        {resource.url && resource.url !== "#" ? (
+          <a className="ghost-button" href={resource.url} target="_blank" rel="noreferrer">
+            {resource.source === "canva" ? "Abrir en Canva" : resource.source === "canvas" ? "Abrir en Canvas" : "Abrir"}
+          </a>
+        ) : (
+          <button className="ghost-button">
+            {resource.source === "canva" ? "Abrir en Canva" : resource.source === "canvas" ? "Abrir en Canvas" : "Abrir"}
+          </button>
+        )}
+        {isCanvaLiveResult && (
+          <button className="primary-button" onClick={() => onImportCanva?.(resource.canvaDesign)}>
+            Guardar
+          </button>
+        )}
         <button className="ghost-button">Parecidos</button>
       </div>
     </article>
