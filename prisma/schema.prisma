@@ -93,6 +93,7 @@ model Workspace {
   resources    Resource[]
   tags         Tag[]
   objectives   CurriculumObjective[]
+  curriculumUnits CurriculumUnit[]
   generations  GeneratedItem[]
 
   @@index([ownerUserId])
@@ -279,10 +280,44 @@ model CurriculumObjective {
   workspace   Workspace?              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   classes     ClassSessionObjective[]
   resources   ResourceObjective[]
+  units       CurriculumUnitObjective[]
 
   @@unique([workspaceId, country, source, level, subject, code])
   @@index([level, subject])
   @@index([axis])
+}
+
+model CurriculumUnit {
+  id          String                    @id @default(cuid())
+  workspaceId String?
+  country     String                    @default("CL")
+  source      String                    @default("MINEDUC")
+  version     String?
+  level       String
+  subject     String
+  code        String
+  title       String
+  description String?
+  orderIndex  Int
+  sourceUrl   String?
+  isActive    Boolean                   @default(true)
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  workspace   Workspace?                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  objectives  CurriculumUnitObjective[]
+
+  @@unique([workspaceId, country, source, level, subject, code])
+  @@index([level, subject, orderIndex])
+}
+
+model CurriculumUnitObjective {
+  curriculumUnitId String
+  objectiveId      String
+  curriculumUnit   CurriculumUnit       @relation(fields: [curriculumUnitId], references: [id], onDelete: Cascade)
+  objective        CurriculumObjective  @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+
+  @@id([curriculumUnitId, objectiveId])
+  @@index([objectiveId])
 }
 
 model ClassSessionObjective {
