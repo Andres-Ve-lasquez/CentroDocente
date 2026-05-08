@@ -6,8 +6,8 @@
     "level": "4 Basico",
     "subject": "Lenguaje",
     "code": "LE04 U1",
-    "title": "Desarrollar habilidades de comprension lectora y comunicacion oral",
-    "description": "Unidad inicial orientada a lectura frecuente, estrategias de comprension, conversacion literaria y produccion de respuestas orales y escritas.",
+    "title": "Desarrollar habilidades comunicativas y reforzar comprension lectora",
+    "description": "Habilidades comunicativas mediante la produccion oral y escrita de textos narrativos y no literarios. Estrategias para llevar a cabo dialogos y discusiones en clases.",
     "orderIndex": 1,
     "sourceUrl": "https://www.curriculumnacional.cl/docente/629/w3-article-18963.html",
     "objectiveCodes": ["LE04 OA 01", "LE04 OA 02", "LE04 OA 03", "LE04 OA 04", "LE04 OA 06", "LE04 OA 10", "LE04 OA 11", "LE04 OA 25", "LE04 OA 26", "LE04 OA 27", "LE04 OA 28"]
@@ -19,8 +19,8 @@
     "level": "4 Basico",
     "subject": "Lenguaje",
     "code": "LE04 U2",
-    "title": "Profundizar la comprension de narraciones, poemas y escritura",
-    "description": "Unidad enfocada en lectura literaria, analisis de narraciones y poemas, planificacion y revision de textos.",
+    "title": "Desarrollar habilidades de comprension lectora y comunicacion oral en torno a poesia y narrativa",
+    "description": "Procesos de escritura, con enfasis en la planificacion y la revision. Nuevas reglas ortograficas acorde a las convenciones sociales en torno a su edad.",
     "orderIndex": 2,
     "sourceUrl": "https://www.curriculumnacional.cl/docente/629/w3-article-18963.html",
     "objectiveCodes": ["LE04 OA 03", "LE04 OA 04", "LE04 OA 05", "LE04 OA 07", "LE04 OA 11", "LE04 OA 16", "LE04 OA 17", "LE04 OA 18", "LE04 OA 19", "LE04 OA 20", "LE04 OA 21", "LE04 OA 22", "LE04 OA 23", "LE04 OA 25", "LE04 OA 27", "LE04 OA 30"]
@@ -32,8 +32,8 @@
     "level": "4 Basico",
     "subject": "Lenguaje",
     "code": "LE04 U3",
-    "title": "Textos no literarios, investigacion y comunicacion de informacion",
-    "description": "Unidad centrada en lectura de textos informativos, busqueda de informacion, organizacion de ideas y presentaciones.",
+    "title": "Adquirir habilidades de lectura, escritura y comunicacion oral para desarrollar una investigacion",
+    "description": "Lectura de una gran variedad de textos para ampliar sus conocimientos y adquirir nuevas habilidades para desarrollar una investigacion. Redaccion de articulo tematico.",
     "orderIndex": 3,
     "sourceUrl": "https://www.curriculumnacional.cl/docente/629/w3-article-18963.html",
     "objectiveCodes": ["LE04 OA 06", "LE04 OA 08", "LE04 OA 09", "LE04 OA 10", "LE04 OA 13", "LE04 OA 14", "LE04 OA 16", "LE04 OA 17", "LE04 OA 18", "LE04 OA 23", "LE04 OA 25", "LE04 OA 27", "LE04 OA 28"]
@@ -45,8 +45,8 @@
     "level": "4 Basico",
     "subject": "Lenguaje",
     "code": "LE04 U4",
-    "title": "Lectura literaria, dramatizacion y cierre anual",
-    "description": "Unidad de consolidacion para lectura, interpretacion, escritura creativa, dramatizacion y exposicion oral.",
+    "title": "Leer textos narrativos variados y asistir a representacion teatral",
+    "description": "Lectura y comentario de una novela. Acudir por lo menos a una representacion teatral para trabajar los textos orales. Aplicar la gramatica en la escritura de narraciones.",
     "orderIndex": 4,
     "sourceUrl": "https://www.curriculumnacional.cl/docente/629/w3-article-18963.html",
     "objectiveCodes": ["LE04 OA 03", "LE04 OA 04", "LE04 OA 07", "LE04 OA 11", "LE04 OA 12", "LE04 OA 17", "LE04 OA 19", "LE04 OA 20", "LE04 OA 21", "LE04 OA 22", "LE04 OA 24", "LE04 OA 25", "LE04 OA 27", "LE04 OA 29"]
