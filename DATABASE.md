@@ -74,3 +74,36 @@ Rutas disponibles:
 ```
 
 La ruta LTI entrega una configuracion inicial para registrar la app como herramienta externa en Canvas.
+
+## Canva
+
+Canva no es Canvas LMS. Para integrar `canva.com/projects`, usa Canva Connect API.
+
+Variables:
+
+```env
+CANVA_CLIENT_ID=""
+CANVA_CLIENT_SECRET=""
+CANVA_REDIRECT_URI="https://TU-APP.vercel.app/api/canva/auth/callback"
+```
+
+En Canva Developers debes crear una integracion, configurar el redirect URI y solicitar scopes como:
+
+```txt
+design:meta:read
+design:permission:read
+folder:read
+asset:read
+```
+
+Rutas disponibles:
+
+```txt
+/api/canva/auth/start
+/api/canva/auth/callback
+/api/canva/status
+/api/canva/designs
+/api/canva/folders/:folderId/items
+```
+
+Luego desde Configuracion puedes conectar Canva y cargar proyectos recientes.

@@ -687,6 +687,30 @@ textarea:focus {
   min-width: 0;
 }
 
+.canva-design-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.canva-design-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  box-shadow: var(--shadow-soft);
+}
+
+.canva-design-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+
 .primary-button,
 .ghost-button,
 .text-button,
@@ -829,7 +853,8 @@ textarea:focus {
   .settings-grid,
   .class-detail-layout,
   .course-curriculum-layout,
-  .canvas-data-grid {
+  .canvas-data-grid,
+  .canva-design-grid {
     grid-template-columns: 1fr;
   }
 }

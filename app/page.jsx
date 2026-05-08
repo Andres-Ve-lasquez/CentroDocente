@@ -368,6 +368,9 @@ export default function HomePage() {
     assignments: [],
     files: []
   });
+  const [canvaStatus, setCanvaStatus] = useState("Canva no conectado");
+  const [canvaQuery, setCanvaQuery] = useState("");
+  const [canvaDesigns, setCanvaDesigns] = useState([]);
   const [toast, setToast] = useState("");
   const [draftClass, setDraftClass] = useState({
     title: "",
@@ -641,6 +644,37 @@ export default function HomePage() {
       setCanvasStatus("Datos Canvas cargados.");
     } catch (error) {
       setCanvasStatus(error instanceof Error ? error.message : "No se pudieron cargar datos Canvas");
+    }
+  }
+
+  async function loadCanvaStatus() {
+    setCanvaStatus("Consultando Canva...");
+    try {
+      const response = await fetch("/api/canva/status");
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.message || "Canva no conectado");
+      setCanvaStatus(data.connected ? "Canva conectado" : "Canva no conectado");
+      showToast("Canva conectado.");
+    } catch (error) {
+      setCanvaStatus(error instanceof Error ? error.message : "No se pudo conectar Canva");
+    }
+  }
+
+  async function loadCanvaDesigns() {
+    setCanvaStatus("Cargando proyectos de Canva...");
+    try {
+      const params = new URLSearchParams({
+        limit: "24",
+        sort_by: "modified_descending"
+      });
+      if (canvaQuery.trim()) params.set("query", canvaQuery.trim());
+      const response = await fetch(`/api/canva/designs?${params}`);
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.message || "No se pudieron cargar proyectos Canva");
+      setCanvaDesigns(data.designs ?? []);
+      setCanvaStatus(`${data.designs?.length ?? 0} proyectos Canva cargados.`);
+    } catch (error) {
+      setCanvaStatus(error instanceof Error ? error.message : "No se pudieron cargar proyectos Canva");
     }
   }
 
@@ -1542,6 +1576,67 @@ export default function HomePage() {
               </section>
               <section className="panel">
                 <h2>Conectores</h2>
+                <div className="connector-row">
+                  <div>
+                    <strong>Canva</strong>
+                    <span>{canvaStatus}</span>
+                  </div>
+                  <div className="connector-actions">
+                    <button className="ghost-button" onClick={() => window.location.assign("/api/canva/auth/start")}>
+                      Conectar Canva
+                    </button>
+                    <button className="primary-button" onClick={loadCanvaDesigns}>
+                      Cargar proyectos
+                    </button>
+                  </div>
+                </div>
+                <div className="connector-config">
+                  <p className="muted">
+                    Integra los proyectos de <code>canva.com/projects</code> usando Canva Connect API. Requiere
+                    <code>CANVA_CLIENT_ID</code>, <code>CANVA_CLIENT_SECRET</code> y <code>CANVA_REDIRECT_URI</code>.
+                  </p>
+                  <label>
+                    Buscar en Canva
+                    <input
+                      value={canvaQuery}
+                      onChange={(event) => setCanvaQuery(event.target.value)}
+                      placeholder="Ej: diploma, guia, lectura, presentacion..."
+                    />
+                  </label>
+                  <button className="ghost-button" onClick={loadCanvaStatus}>
+                    Probar conexion Canva
+                  </button>
+                  {canvaDesigns.length > 0 && (
+                    <div className="canva-design-grid">
+                      {canvaDesigns.map((design) => (
+                        <article className="canva-design-card" key={design.id}>
+                          {design.thumbnail?.url && (
+                            <img src={design.thumbnail.url} alt="" className="canva-design-thumb" />
+                          )}
+                          <div>
+                            <strong>{design.title || "Diseno sin titulo"}</strong>
+                            <div className="card-meta">
+                              <span>ID Canva: {design.id}</span>
+                              <span>{design.page_count ? `${design.page_count} paginas` : "Canva"}</span>
+                            </div>
+                          </div>
+                          <div className="resource-actions">
+                            {design.urls?.edit_url && (
+                              <a className="ghost-button" href={design.urls.edit_url} target="_blank" rel="noreferrer">
+                                Editar
+                              </a>
+                            )}
+                            {design.urls?.view_url && (
+                              <a className="text-button" href={design.urls.view_url} target="_blank" rel="noreferrer">
+                                Ver
+                              </a>
+                            )}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="connector-row">
                   <div>
                     <strong>Microsoft OneDrive</strong>
