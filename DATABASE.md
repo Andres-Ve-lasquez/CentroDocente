@@ -85,16 +85,16 @@ Variables:
 CANVA_CLIENT_ID=""
 CANVA_CLIENT_SECRET=""
 CANVA_REDIRECT_URI="https://TU-APP.vercel.app/api/canva/auth/callback"
+CANVA_SCOPES="design:meta:read"
 ```
 
-En Canva Developers debes crear una integracion, configurar el redirect URI y solicitar scopes como:
+En Canva Developers debes crear una integracion, configurar el redirect URI y habilitar los mismos scopes que vas a pedir desde la app. Para el MVP basta con:
 
 ```txt
 design:meta:read
-design:permission:read
-folder:read
-asset:read
 ```
+
+Si despues quieres listar carpetas, agrega `folder:read` en Canva Developers y tambien en `CANVA_SCOPES`.
 
 Rutas disponibles:
 
