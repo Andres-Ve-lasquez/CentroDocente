@@ -361,7 +361,6 @@ export default function HomePage() {
   const [resourceType, setResourceType] = useState("all");
   const [resourceSource, setResourceSource] = useState("all");
   const [resourceUsage, setResourceUsage] = useState("all");
-  const [libraryTitleQuery, setLibraryTitleQuery] = useState("");
   const [libraryDateFrom, setLibraryDateFrom] = useState("");
   const [libraryDateTo, setLibraryDateTo] = useState("");
   const [librarySort, setLibrarySort] = useState("date_desc");
@@ -715,7 +714,7 @@ export default function HomePage() {
         ownership: canvaOwnership,
         sort_by: canvaSortBy
       });
-      const query = canvaQuery.trim() || libraryTitleQuery.trim();
+      const query = globalSearch.trim() || canvaQuery.trim();
       if (query) params.set("query", query);
       const response = await fetch(`/api/canva/designs?${params}`);
       const data = await response.json();
@@ -770,7 +769,7 @@ export default function HomePage() {
   );
 
   const filteredResources = useMemo(() => {
-    const query = normalize([globalSearch, libraryTitleQuery].filter(Boolean).join(" "));
+    const query = normalize(globalSearch);
     return [...resources, ...canvaLibraryItems]
       .filter((resource) => {
         if (!query) return true;
@@ -786,7 +785,12 @@ export default function HomePage() {
         );
         return query.split(/\s+/).every((part) => text.includes(part));
       })
-      .filter((resource) => resourceCourse === "all" || resource.courseId === resourceCourse)
+      .filter(
+        (resource) =>
+          resourceCourse === "all" ||
+          resource.courseId === resourceCourse ||
+          (resource.source === "canva" && resourceSource === "canva")
+      )
       .filter((resource) => resourceType === "all" || resource.type === resourceType)
       .filter((resource) => resourceSource === "all" || resource.source === resourceSource)
       .filter((resource) => !libraryDateFrom || resource.date >= libraryDateFrom)
@@ -809,7 +813,6 @@ export default function HomePage() {
     libraryDateFrom,
     libraryDateTo,
     librarySort,
-    libraryTitleQuery,
     resourceCourse,
     resourceSource,
     resourceType,
@@ -818,8 +821,8 @@ export default function HomePage() {
   ]);
 
   const allTags = [...new Set(resources.flatMap((resource) => resource.tags))];
-  const resourceTypes = [...new Set(resources.map((resource) => resource.type))];
-  const resourceSources = [...new Set([...resources, ...canvaLibraryItems].map((resource) => resource.source))];
+  const resourceTypes = [...new Set([...resources, ...canvaLibraryItems].map((resource) => resource.type))];
+  const resourceSources = [...new Set([...resources, ...canvaLibraryItems, { source: "canva" }].map((resource) => resource.source))];
 
   return (
     <div className="app-shell">
@@ -855,8 +858,10 @@ export default function HomePage() {
             <strong className="status-warn">{oneDriveConfig.clientId ? "Configurable" : "Demo"}</strong>
           </div>
           <div className="sync-row">
-            <span>Canvas</span>
-            <strong className="status-warn">Pendiente</strong>
+            <span>Canva</span>
+            <strong className={canvaDesigns.length ? "status-ok" : "status-warn"}>
+              {canvaDesigns.length ? "Activo" : "Pendiente"}
+            </strong>
           </div>
         </section>
       </aside>
@@ -867,10 +872,11 @@ export default function HomePage() {
             <span aria-hidden="true">⌕</span>
             <input
               type="search"
-              placeholder="Buscar guia, SIMCE, mito, abril..."
+              placeholder="Buscar en recursos y Canva: guia, SIMCE, mito, abril..."
               value={globalSearch}
               onChange={(event) => {
                 setGlobalSearch(event.target.value);
+                setCanvaQuery(event.target.value);
                 if (event.target.value.length > 2) setActiveView("library");
               }}
             />
@@ -1409,6 +1415,11 @@ export default function HomePage() {
             </div>
 
             <section className="panel library-command">
+              <div className="library-command-summary">
+                <span className="eyebrow">Buscador unico</span>
+                <strong>{globalSearch ? `Buscando "${globalSearch}"` : "Usa el buscador superior para recursos y Canva"}</strong>
+                <small>La misma consulta filtra la biblioteca y se envia a Canva al presionar Buscar en Canva.</small>
+              </div>
               <div className="library-search-main">
                 <label>
                   Buscar por titulo o palabra clave
@@ -1416,9 +1427,9 @@ export default function HomePage() {
                     <span aria-hidden="true">⌕</span>
                     <input
                       type="search"
-                      value={libraryTitleQuery}
+                      value={globalSearch}
                       onChange={(event) => {
-                        setLibraryTitleQuery(event.target.value);
+                        setGlobalSearch(event.target.value);
                         setCanvaQuery(event.target.value);
                       }}
                       placeholder="Ej: diploma, guia de inferencias, SIMCE, mitos..."
@@ -1595,8 +1606,8 @@ export default function HomePage() {
                       setResourceUsage("all");
                       setLibraryDateFrom("");
                       setLibraryDateTo("");
-                      setLibraryTitleQuery("");
                       setGlobalSearch("");
+                      setCanvaQuery("");
                     }}
                   >
                     Limpiar
