@@ -667,6 +667,16 @@ textarea:focus {
   padding-right: 0;
 }
 
+.text-link {
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
 .icon-button {
   width: 40px;
   padding: 0;

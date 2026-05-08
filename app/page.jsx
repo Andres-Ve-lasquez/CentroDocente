@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import curriculumObjectives from "../data/curriculum/lenguaje-cl.json";
 
 const initialCourses = [
   {
@@ -55,7 +56,7 @@ const initialClasses = [
     notes: "Usar texto corto y ticket de salida de 3 preguntas.",
     status: "done",
     reusedFrom: null,
-    objectiveCode: "OA Lectura"
+    objectiveCode: "LE04 OA 02"
   },
   {
     id: "cl2",
@@ -69,7 +70,7 @@ const initialClasses = [
     notes: "Reforzar diferencia entre dato explicito e inferencia.",
     status: "planned",
     reusedFrom: "2025-cl-18",
-    objectiveCode: "OA Lectura"
+    objectiveCode: "LE04 OA 04"
   },
   {
     id: "cl3",
@@ -83,7 +84,7 @@ const initialClasses = [
     notes: "Material reutilizado desde abril 2025.",
     status: "planned",
     reusedFrom: "2025-cl-33",
-    objectiveCode: "OA Lectura"
+    objectiveCode: "LE05 OA 06"
   },
   {
     id: "cl4",
@@ -97,7 +98,7 @@ const initialClasses = [
     notes: "Buscar material parecido a clase de 2025.",
     status: "planned",
     reusedFrom: null,
-    objectiveCode: "OA Literatura"
+    objectiveCode: "LE07 OA 06"
   }
 ];
 
@@ -172,33 +173,6 @@ const initialResources = [
   }
 ];
 
-const curriculumObjectives = [
-  {
-    id: "oa-lectura",
-    code: "OA Lectura",
-    level: "4 Basico",
-    subject: "Lenguaje",
-    axis: "Lectura",
-    description: "Comprender textos aplicando estrategias de lectura y justificando respuestas con evidencia."
-  },
-  {
-    id: "oa-inferencia",
-    code: "OA Inferencia",
-    level: "5 Basico",
-    subject: "Lenguaje",
-    axis: "Lectura",
-    description: "Realizar inferencias a partir de pistas del texto y conocimientos previos."
-  },
-  {
-    id: "oa-literatura",
-    code: "OA Literatura",
-    level: "7 Basico",
-    subject: "Lenguaje",
-    axis: "Literatura",
-    description: "Analizar textos literarios considerando caracteristicas, proposito y contexto."
-  }
-];
-
 const labels = {
   planned: "Planificada",
   in_progress: "En progreso",
@@ -270,6 +244,17 @@ function tagsFromName(name) {
   return tags.length ? tags : ["onedrive"];
 }
 
+function objectivesForCourse(course) {
+  if (!course) return curriculumObjectives;
+  return curriculumObjectives.filter(
+    (objective) => objective.level === course.level && objective.subject === course.subject
+  );
+}
+
+function objectiveByCode(code) {
+  return curriculumObjectives.find((objective) => objective.code === code);
+}
+
 function getDemoDriveResults(query) {
   const clean = normalize(query);
   return [
@@ -317,6 +302,8 @@ export default function HomePage() {
   const [assistantOutput, setAssistantOutput] = useState(
     "Completa el formulario para crear una propuesta lista para ajustar y guardar."
   );
+  const [assistantCourseId, setAssistantCourseId] = useState("c1");
+  const [assistantObjectiveCode, setAssistantObjectiveCode] = useState("LE04 OA 02");
   const [oneDriveQuery, setOneDriveQuery] = useState("");
   const [oneDriveResults, setOneDriveResults] = useState([]);
   const [oneDriveConfig, setOneDriveConfig] = useState({
@@ -326,7 +313,13 @@ export default function HomePage() {
     connected: false
   });
   const [toast, setToast] = useState("");
-  const [draftClass, setDraftClass] = useState({ title: "", courseId: "c1", date: "2026-05-07", objective: "" });
+  const [draftClass, setDraftClass] = useState({
+    title: "",
+    courseId: "c1",
+    date: "2026-05-07",
+    objective: "",
+    objectiveCode: "LE04 OA 02"
+  });
   const [draftCourse, setDraftCourse] = useState({
     name: "",
     level: "",
@@ -342,6 +335,7 @@ export default function HomePage() {
 
   const activeCourse = courses.find((course) => course.id === activeCourseId) ?? courses[0];
   const activeClass = classes.find((item) => item.id === activeClassId) ?? classes[0];
+  const activeClassObjective = objectiveByCode(activeClass?.objectiveCode);
 
   function showToast(message) {
     setToast(message);
@@ -405,10 +399,16 @@ export default function HomePage() {
         notes: "",
         status: "planned",
         reusedFrom: null,
-        objectiveCode: ""
+        objectiveCode: draftClass.objectiveCode
       }
     ]);
-    setDraftClass({ title: "", courseId: activeCourseId, date: "2026-05-07", objective: "" });
+    setDraftClass({
+      title: "",
+      courseId: activeCourseId,
+      date: "2026-05-07",
+      objective: "",
+      objectiveCode: objectivesForCourse(activeCourse)?.[0]?.code ?? ""
+    });
     showToast("Clase creada en el planificador.");
   }
 
@@ -501,12 +501,16 @@ export default function HomePage() {
     const course = courseById(form.get("courseId"));
     const type = form.get("type");
     const topic = form.get("topic") || "comprension lectora";
-    const objective = curriculumObjectives.find((item) => item.level === course?.level) ?? curriculumObjectives[0];
+    const selectedCode = form.get("objectiveCode");
+    const objective =
+      curriculumObjectives.find((item) => item.code === selectedCode) ??
+      objectivesForCourse(course)[0] ??
+      curriculumObjectives[0];
     const outputs = {
-      objective: `Objetivo sugerido\nA partir de ${objective.code}, los estudiantes trabajaran ${topic} en ${course?.level}, justificando sus respuestas con evidencia del texto.`,
-      activity: `Inicio: pregunta breve sobre ${topic}.\nDesarrollo: modelamiento docente, practica guiada y trabajo colaborativo.\nCierre: ticket de salida asociado a ${objective.code}.`,
-      simce: `Set tipo SIMCE\n1. Pregunta literal.\n2. Pregunta de inferencia.\n3. Vocabulario contextual.\n4. Proposito del texto.\n\nOA vinculado: ${objective.code}.`,
-      ticket: `Ticket de salida\n1. Una idea clave.\n2. Una respuesta justificada.\n3. Nivel de seguridad: bajo, medio o alto.`
+      objective: `Objetivo de clase basado en ${objective.code}\nLos estudiantes trabajaran ${topic} en ${course?.level}, desarrollando ${objective.title.toLowerCase()} y evidenciando el logro mediante respuestas justificadas.\n\nReferencia oficial: ${objective.sourceUrl}`,
+      activity: `Secuencia basada en ${objective.code}\nInicio: activar conocimientos previos sobre ${topic} y explicitar el criterio de logro.\nDesarrollo: modelamiento docente, practica guiada y actividad colaborativa alineada a ${objective.title}.\nCierre: ticket breve donde cada estudiante demuestra el aprendizaje con evidencia.\n\nOA oficial: ${objective.description}`,
+      simce: `Set tipo SIMCE vinculado a ${objective.code}\n1. Pregunta de informacion explicita.\n2. Pregunta de inferencia o interpretacion.\n3. Vocabulario contextual.\n4. Proposito o efecto del texto.\n\nHabilidad foco: ${objective.skills}.`,
+      ticket: `Ticket de salida para ${objective.code}\n1. Explica una idea clave trabajada hoy.\n2. Responde una pregunta de aplicacion sobre ${topic}.\n3. Justifica tu respuesta con evidencia o criterio del OA.\n\nCriterio: ${objective.title}.`
     };
     setAssistantOutput(outputs[type] ?? outputs.objective);
   }
@@ -843,13 +847,17 @@ export default function HomePage() {
                 <div>
                   <h3>Objetivos curriculares asociados</h3>
                   <div className="stack-list compact">
-                    {curriculumObjectives
-                      .filter((objective) => objective.level === activeCourse?.level)
+                    {objectivesForCourse(activeCourse)
                       .map((objective) => (
-                        <article className="class-card" key={objective.id}>
+                        <article className="class-card" key={objective.code}>
                           <div>
-                            <strong>{objective.code}</strong>
+                            <strong>
+                              {objective.code} · {objective.title}
+                            </strong>
                             <p className="muted">{objective.description}</p>
+                            <a className="text-link" href={objective.sourceUrl} target="_blank" rel="noreferrer">
+                              Ver fuente oficial
+                            </a>
                           </div>
                         </article>
                       ))}
@@ -883,7 +891,14 @@ export default function HomePage() {
                   Curso
                   <select
                     value={draftClass.courseId}
-                    onChange={(event) => setDraftClass({ ...draftClass, courseId: event.target.value })}
+                    onChange={(event) => {
+                      const nextCourse = courseById(event.target.value);
+                      setDraftClass({
+                        ...draftClass,
+                        courseId: event.target.value,
+                        objectiveCode: objectivesForCourse(nextCourse)[0]?.code ?? ""
+                      });
+                    }}
                   >
                     {courses
                       .filter((course) => course.active)
@@ -892,6 +907,19 @@ export default function HomePage() {
                           {course.name}
                         </option>
                       ))}
+                  </select>
+                </label>
+                <label>
+                  OA oficial
+                  <select
+                    value={draftClass.objectiveCode}
+                    onChange={(event) => setDraftClass({ ...draftClass, objectiveCode: event.target.value })}
+                  >
+                    {objectivesForCourse(courseById(draftClass.courseId)).map((objective) => (
+                      <option value={objective.code} key={objective.code}>
+                        {objective.code} · {objective.title}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <label>
@@ -987,7 +1015,21 @@ export default function HomePage() {
                 </div>
                 <div className="detail-section">
                   <h2>OA asociado</h2>
-                  <p>{activeClass.objectiveCode || "Pendiente de seleccionar desde catalogo curricular."}</p>
+                  {activeClassObjective ? (
+                    <>
+                      <p>
+                        <strong>
+                          {activeClassObjective.code} · {activeClassObjective.title}
+                        </strong>
+                      </p>
+                      <p>{activeClassObjective.description}</p>
+                      <a className="text-link" href={activeClassObjective.sourceUrl} target="_blank" rel="noreferrer">
+                        Ver fuente oficial en Curriculo Nacional
+                      </a>
+                    </>
+                  ) : (
+                    <p>Pendiente de seleccionar desde catalogo curricular.</p>
+                  )}
                 </div>
                 <div className="detail-section">
                   <h2>Observaciones</h2>
@@ -997,7 +1039,14 @@ export default function HomePage() {
                   <button className="primary-button" onClick={() => cloneClass(activeClass.id)}>
                     Clonar clase completa
                   </button>
-                  <button className="ghost-button" onClick={() => setActiveView("assistant")}>
+                  <button
+                    className="ghost-button"
+                    onClick={() => {
+                      setAssistantCourseId(activeClass.courseId);
+                      setAssistantObjectiveCode(activeClass.objectiveCode);
+                      setActiveView("assistant");
+                    }}
+                  >
                     Generar actividad
                   </button>
                   <button className="ghost-button" onClick={() => markClassDone(activeClass.id)}>
@@ -1205,10 +1254,32 @@ export default function HomePage() {
               <form className="panel assistant-form" onSubmit={generateAssistant}>
                 <label>
                   Curso
-                  <select name="courseId" defaultValue={activeCourseId}>
+                  <select
+                    name="courseId"
+                    value={assistantCourseId}
+                    onChange={(event) => {
+                      const nextCourse = courseById(event.target.value);
+                      setAssistantCourseId(event.target.value);
+                      setAssistantObjectiveCode(objectivesForCourse(nextCourse)[0]?.code ?? "");
+                    }}
+                  >
                     {courses.map((course) => (
                       <option value={course.id} key={course.id}>
                         {course.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  OA oficial
+                  <select
+                    name="objectiveCode"
+                    value={assistantObjectiveCode}
+                    onChange={(event) => setAssistantObjectiveCode(event.target.value)}
+                  >
+                    {objectivesForCourse(courseById(assistantCourseId)).map((objective) => (
+                      <option value={objective.code} key={objective.code}>
+                        {objective.code} · {objective.title}
                       </option>
                     ))}
                   </select>
@@ -1328,6 +1399,7 @@ function ClassCard({ classItem, course, unit, resourceCount, onOpen }) {
           <span>{unit?.title ?? "Sin unidad"}</span>
           <span>{labels[classItem.status]}</span>
           <span>{resourceCount} recursos</span>
+          <span>{classItem.objectiveCode}</span>
         </div>
       </div>
       <button className="ghost-button" onClick={() => onOpen(classItem.id)}>
@@ -1373,6 +1445,7 @@ function PlanningCard({ classItem, course, unit, resourceCount, onOpen, onClone,
           <span className="status-pill">{labels[classItem.status]}</span>
           <span>{resourceCount} recursos</span>
           <span>{classItem.reusedFrom ? "Reutilizada de anos anteriores" : "Clase nueva"}</span>
+          <span>{classItem.objectiveCode}</span>
         </div>
       </div>
       <div className="planning-actions">

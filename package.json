@@ -2,6 +2,7 @@
   "name": "centro-docente",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -10,7 +11,8 @@
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed:curriculum": "node scripts/seed-curriculum.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
