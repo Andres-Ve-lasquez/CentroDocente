@@ -360,6 +360,14 @@ export default function HomePage() {
     redirectUri: "",
     connected: false
   });
+  const [canvasStatus, setCanvasStatus] = useState("Canvas no probado");
+  const [canvasCourses, setCanvasCourses] = useState([]);
+  const [selectedCanvasCourseId, setSelectedCanvasCourseId] = useState("");
+  const [canvasCourseData, setCanvasCourseData] = useState({
+    modules: [],
+    assignments: [],
+    files: []
+  });
   const [toast, setToast] = useState("");
   const [draftClass, setDraftClass] = useState({
     title: "",
@@ -572,6 +580,68 @@ export default function HomePage() {
       ticket: `Ticket de salida para ${objective.code}\n1. Explica una idea clave trabajada hoy.\n2. Responde una pregunta de aplicacion sobre ${topic}.\n3. Justifica tu respuesta con evidencia o criterio del OA.\n\nCriterio: ${objective.title}.`
     };
     setAssistantOutput(outputs[type] ?? outputs.objective);
+  }
+
+  async function loadCanvasStatus() {
+    setCanvasStatus("Probando conexion Canvas...");
+    try {
+      const response = await fetch("/api/canvas/status");
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.message || "Canvas no disponible");
+      setCanvasStatus(`Conectado a Canvas como ${data.user?.name ?? "usuario Canvas"}`);
+      showToast("Canvas conectado.");
+    } catch (error) {
+      setCanvasStatus(error instanceof Error ? error.message : "No se pudo conectar Canvas");
+      showToast("No se pudo conectar Canvas.");
+    }
+  }
+
+  async function loadCanvasCourses() {
+    setCanvasStatus("Cargando cursos Canvas...");
+    try {
+      const response = await fetch("/api/canvas/courses");
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.message || "No se pudieron cargar cursos");
+      setCanvasCourses(data.courses);
+      setSelectedCanvasCourseId(data.courses[0]?.id ?? "");
+      setCanvasStatus(`${data.courses.length} cursos Canvas cargados.`);
+    } catch (error) {
+      setCanvasStatus(error instanceof Error ? error.message : "No se pudieron cargar cursos Canvas");
+    }
+  }
+
+  async function loadCanvasCourseData(courseId = selectedCanvasCourseId) {
+    if (!courseId) {
+      showToast("Selecciona un curso Canvas.");
+      return;
+    }
+
+    setCanvasStatus("Cargando modulos, tareas y archivos...");
+    try {
+      const [modulesResponse, assignmentsResponse, filesResponse] = await Promise.all([
+        fetch(`/api/canvas/courses/${courseId}/modules`),
+        fetch(`/api/canvas/courses/${courseId}/assignments`),
+        fetch(`/api/canvas/courses/${courseId}/files`)
+      ]);
+      const [modulesData, assignmentsData, filesData] = await Promise.all([
+        modulesResponse.json(),
+        assignmentsResponse.json(),
+        filesResponse.json()
+      ]);
+
+      if (!modulesResponse.ok || !assignmentsResponse.ok || !filesResponse.ok) {
+        throw new Error(modulesData.message || assignmentsData.message || filesData.message || "Canvas no disponible");
+      }
+
+      setCanvasCourseData({
+        modules: modulesData.modules ?? [],
+        assignments: assignmentsData.assignments ?? [],
+        files: filesData.files ?? []
+      });
+      setCanvasStatus("Datos Canvas cargados.");
+    } catch (error) {
+      setCanvasStatus(error instanceof Error ? error.message : "No se pudieron cargar datos Canvas");
+    }
   }
 
   const upcomingClasses = useMemo(
@@ -1506,8 +1576,66 @@ export default function HomePage() {
                 <div className="connector-row">
                   <div>
                     <strong>Canvas LMS</strong>
-                    <span>Proximo paso: API token/OAuth y luego LTI para aparecer dentro de Canvas.</span>
+                    <span>{canvasStatus}</span>
                   </div>
+                  <div className="connector-actions">
+                    <button className="ghost-button" onClick={loadCanvasStatus}>
+                      Probar API
+                    </button>
+                    <button className="primary-button" onClick={loadCanvasCourses}>
+                      Cargar cursos
+                    </button>
+                  </div>
+                </div>
+                <div className="connector-config">
+                  <p className="muted">
+                    Configura en Vercel <code>CANVAS_BASE_URL</code> y <code>CANVAS_ACCESS_TOKEN</code>. Para LTI, usa
+                    la URL <code>/api/canvas/lti/config</code> como base de registro.
+                  </p>
+                  {canvasCourses.length > 0 && (
+                    <>
+                      <label>
+                        Curso Canvas
+                        <select
+                          value={selectedCanvasCourseId}
+                          onChange={(event) => setSelectedCanvasCourseId(event.target.value)}
+                        >
+                          {canvasCourses.map((course) => (
+                            <option value={course.id} key={course.id}>
+                              {course.name || course.course_code}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button className="ghost-button" onClick={() => loadCanvasCourseData()}>
+                        Ver modulos, tareas y archivos
+                      </button>
+                    </>
+                  )}
+                  {(canvasCourseData.modules.length > 0 ||
+                    canvasCourseData.assignments.length > 0 ||
+                    canvasCourseData.files.length > 0) && (
+                    <div className="canvas-data-grid">
+                      <CanvasDataList
+                        title="Modulos"
+                        items={canvasCourseData.modules}
+                        getLabel={(item) => item.name}
+                        getMeta={(item) => `${item.items_count ?? 0} items`}
+                      />
+                      <CanvasDataList
+                        title="Tareas"
+                        items={canvasCourseData.assignments}
+                        getLabel={(item) => item.name}
+                        getMeta={(item) => item.due_at || "sin fecha"}
+                      />
+                      <CanvasDataList
+                        title="Archivos"
+                        items={canvasCourseData.files}
+                        getLabel={(item) => item.display_name || item.filename}
+                        getMeta={(item) => item.content_type || "archivo"}
+                      />
+                    </div>
+                  )}
                 </div>
               </section>
             </div>
@@ -1646,5 +1774,29 @@ function ResourceCard({ resource, course, classItem }) {
         <button className="ghost-button">Parecidos</button>
       </div>
     </article>
+  );
+}
+
+function CanvasDataList({ title, items, getLabel, getMeta }) {
+  return (
+    <section className="canvas-data-list">
+      <div className="panel-heading">
+        <h3>{title}</h3>
+        <span className="mini-badge">{items.length}</span>
+      </div>
+      <div className="stack-list compact">
+        {items.slice(0, 8).map((item) => (
+          <article className="class-card" key={item.id}>
+            <div>
+              <strong>{getLabel(item)}</strong>
+              <div className="card-meta">
+                <span>ID Canvas: {item.id}</span>
+                <span>{getMeta(item)}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }

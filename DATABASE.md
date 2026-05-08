@@ -51,3 +51,26 @@ http://localhost:3000/api/health/db
 ```
 
 Si responde `{ "ok": true }`, la app ya esta conectada a PostgreSQL.
+
+## Canvas
+
+Para probar Canvas API, agrega estas variables en `.env` y en Vercel:
+
+```env
+CANVAS_BASE_URL="https://TU-INSTITUCION.instructure.com"
+CANVAS_ACCESS_TOKEN="token-personal-o-token-oauth"
+CANVAS_ACCOUNT_ID="1"
+```
+
+Rutas disponibles:
+
+```txt
+/api/canvas/status
+/api/canvas/courses
+/api/canvas/courses/:courseId/modules
+/api/canvas/courses/:courseId/assignments
+/api/canvas/courses/:courseId/files
+/api/canvas/lti/config
+```
+
+La ruta LTI entrega una configuracion inicial para registrar la app como herramienta externa en Canvas.

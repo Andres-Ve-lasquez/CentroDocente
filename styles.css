@@ -670,6 +670,23 @@ textarea:focus {
   gap: 12px;
 }
 
+.connector-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.canvas-data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.canvas-data-list {
+  min-width: 0;
+}
+
 .primary-button,
 .ghost-button,
 .text-button,
@@ -811,7 +828,8 @@ textarea:focus {
   .assistant-layout,
   .settings-grid,
   .class-detail-layout,
-  .course-curriculum-layout {
+  .course-curriculum-layout,
+  .canvas-data-grid {
     grid-template-columns: 1fr;
   }
 }

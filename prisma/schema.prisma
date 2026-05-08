@@ -66,6 +66,14 @@ enum GeneratedItemType {
   EXIT_TICKET
 }
 
+enum CanvasItemType {
+  COURSE
+  MODULE
+  ASSIGNMENT
+  FILE
+  PAGE
+}
+
 model User {
   id                 String              @id @default(cuid())
   name               String
@@ -94,6 +102,7 @@ model Workspace {
   tags         Tag[]
   objectives   CurriculumObjective[]
   curriculumUnits CurriculumUnit[]
+  canvasItems CanvasExternalItem[]
   generations  GeneratedItem[]
 
   @@index([ownerUserId])
@@ -129,6 +138,7 @@ model Course {
   classes                ClassSession[]
   resources              Resource[]
   generatedItems         GeneratedItem[]
+  canvasItems            CanvasExternalItem[]
 
   @@index([workspaceId, schoolYear])
   @@index([workspaceId, level, subject])
@@ -208,12 +218,41 @@ model Resource {
   sources         ResourceSource[]
   tags            ResourceTag[]
   objectives      ResourceObjective[]
+  canvasItems     CanvasExternalItem[]
 
   @@index([workspaceId, resourceType])
   @@index([workspaceId, sourceType])
   @@index([courseId])
   @@index([classSessionId])
   @@index([hash])
+}
+
+model CanvasExternalItem {
+  id                 String         @id @default(cuid())
+  workspaceId        String?
+  courseId           String?
+  resourceId         String?
+  itemType           CanvasItemType
+  canvasCourseId     String?
+  canvasModuleId     String?
+  canvasAssignmentId String?
+  canvasFileId       String?
+  title              String
+  htmlUrl            String?
+  metadataJson       Json?
+  lastSyncedAt       DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  workspace          Workspace?     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  course             Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  resource           Resource?      @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, itemType])
+  @@index([courseId])
+  @@index([resourceId])
+  @@index([canvasCourseId])
+  @@index([canvasAssignmentId])
+  @@index([canvasFileId])
 }
 
 model ResourceSource {
