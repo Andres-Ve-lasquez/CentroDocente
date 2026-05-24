@@ -1608,6 +1608,27 @@ body,
   background: #f8fbff;
 }
 
+.danger-button {
+  color: #b42318;
+  border-color: rgba(232, 93, 117, 0.38);
+  background: #fff7f7;
+}
+
+.danger-button:hover {
+  color: #8f1f16;
+  border-color: rgba(180, 35, 24, 0.55);
+  background: #ffecec;
+}
+
+.primary-button:disabled,
+.ghost-button:disabled,
+.text-button:disabled,
+.back-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  box-shadow: none;
+}
+
 .date-pill,
 .mini-badge,
 .tag,

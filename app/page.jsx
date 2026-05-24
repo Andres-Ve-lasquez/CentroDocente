@@ -202,6 +202,38 @@ export default function HomePage() {
     showToast("Clase marcada como realizada.");
   }
 
+  function deleteClass(id) {
+    const target = classes.find((item) => item.id === id);
+    if (!target) return;
+
+    setClasses((items) => {
+      const nextItems = items.filter((item) => item.id !== id);
+      if (activeClassId === id) setActiveClassId(nextItems[0]?.id ?? "");
+      return nextItems;
+    });
+    setResources((items) => items.map((resource) => (resource.classId === id ? { ...resource, classId: null } : resource)));
+    showToast(`Clase eliminada: ${target.title}.`);
+  }
+
+  function deleteDoneClasses() {
+    const doneIds = new Set(classes.filter((item) => item.status === "done").map((item) => item.id));
+    if (!doneIds.size) {
+      showToast("No hay clases realizadas para eliminar.");
+      return;
+    }
+
+    setClasses((items) => {
+      const nextItems = items.filter((item) => !doneIds.has(item.id));
+      if (doneIds.has(activeClassId)) setActiveClassId(nextItems[0]?.id ?? "");
+      return nextItems;
+    });
+    setResources((items) =>
+      items.map((resource) => (doneIds.has(resource.classId) ? { ...resource, classId: null } : resource))
+    );
+    setPlannerStatus("all");
+    showToast(`${doneIds.size} clases realizadas eliminadas.`);
+  }
+
   function createClass(event) {
     event.preventDefault();
     const firstUnit = units.find((unit) => unit.courseId === draftClass.courseId);
@@ -1208,6 +1240,14 @@ export default function HomePage() {
                     ))}
                   </select>
                 </label>
+                <button
+                  className="ghost-button danger-button"
+                  type="button"
+                  onClick={deleteDoneClasses}
+                  disabled={!classes.some((item) => item.status === "done")}
+                >
+                  Eliminar realizadas
+                </button>
               </aside>
               <div className="planner-list">
                 {filteredPlannerClasses.map((item) => (
@@ -1219,6 +1259,7 @@ export default function HomePage() {
                     onOpen={openClass}
                     onClone={cloneClass}
                     onDone={markClassDone}
+                    onDelete={deleteClass}
                     key={item.id}
                   />
                 ))}

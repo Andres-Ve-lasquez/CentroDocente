@@ -90,8 +90,9 @@ export function CompactClass({ classItem, course, onOpen }) {
   );
 }
 
-export function PlanningCard({ classItem, course, unit, resourceCount, onOpen, onClone, onDone }) {
+export function PlanningCard({ classItem, course, unit, resourceCount, onOpen, onClone, onDone, onDelete }) {
   const date = formatMonthDay(classItem.date);
+  const isDone = classItem.status === "done";
   return (
     <article className="planning-card">
       <div className="date-box" style={{ background: course?.color }}>
@@ -119,9 +120,15 @@ export function PlanningCard({ classItem, course, unit, resourceCount, onOpen, o
         <button className="ghost-button" onClick={() => onClone(classItem.id)}>
           Clonar
         </button>
-        <button className="text-button" onClick={() => onDone(classItem.id)}>
-          Realizada
-        </button>
+        {isDone ? (
+          <button className="ghost-button danger-button" onClick={() => onDelete?.(classItem.id)}>
+            Eliminar
+          </button>
+        ) : (
+          <button className="text-button" onClick={() => onDone(classItem.id)}>
+            Realizada
+          </button>
+        )}
       </div>
     </article>
   );
