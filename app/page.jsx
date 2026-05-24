@@ -1,291 +1,54 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  BookOpenCheck,
+  Bot,
+  CalendarPlus,
+  CalendarDays,
+  FilePlus2,
+  Flag,
+  FolderOpen,
+  GraduationCap,
+  Home,
+  Library,
+  PlusCircle,
+  Search,
+  Settings,
+  Sparkles
+} from "lucide-react";
+import {
+  CanvasDataList,
+  ClassCard,
+  CompactClass,
+  PlanningCard,
+  ResourceCard,
+  ResourceMini,
+  WorkflowGuide
+} from "./components/dashboard-cards";
 import curriculumObjectives from "../data/curriculum/lenguaje-cl.json";
 import curriculumUnits from "../data/curriculum/units-cl-lenguaje.json";
-
-const initialCourses = [
-  {
-    id: "c1",
-    name: "4 Basico A",
-    level: "4 Basico",
-    subject: "Lenguaje",
-    year: 2026,
-    color: "#2878e0",
-    canvasId: null,
-    active: true
-  },
-  {
-    id: "c2",
-    name: "5 Basico B",
-    level: "5 Basico",
-    subject: "Lenguaje",
-    year: 2026,
-    color: "#14a884",
-    canvasId: "canvas-4281",
-    active: true
-  },
-  {
-    id: "c3",
-    name: "7 Basico",
-    level: "7 Basico",
-    subject: "Lenguaje",
-    year: 2026,
-    color: "#f0a926",
-    canvasId: null,
-    active: true
-  },
-  {
-    id: "c4",
-    name: "6 Basico",
-    level: "6 Basico",
-    subject: "Lenguaje",
-    year: 2026,
-    color: "#ee5d78",
-    canvasId: null,
-    active: true
-  },
-  {
-    id: "c5",
-    name: "8 Basico",
-    level: "8 Basico",
-    subject: "Lenguaje",
-    year: 2026,
-    color: "#7b61ff",
-    canvasId: null,
-    active: true
-  }
-];
-
-const initialUnits = [
-  { id: "u1", courseId: "c1", title: "Unidad 1: Comprension lectora", order: 1 },
-  { id: "u2", courseId: "c1", title: "Unidad 2: Textos no literarios", order: 2 },
-  { id: "u3", courseId: "c2", title: "Unidad 1: Inferencias", order: 1 },
-  { id: "u4", courseId: "c3", title: "Unidad 1: Mitos y leyendas", order: 1 },
-  { id: "u5", courseId: "c4", title: "Unidad 1: Textos informativos", order: 1 },
-  { id: "u6", courseId: "c5", title: "Unidad 1: Experiencia humana y literatura", order: 1 }
-];
-
-const initialClasses = [
-  {
-    id: "cl1",
-    courseId: "c1",
-    unitId: "u1",
-    title: "Clase 1 - Estrategias antes de leer",
-    date: "2026-04-29",
-    objective:
-      "Activar conocimientos previos y formular predicciones a partir de titulo, imagenes y vocabulario clave.",
-    skills: "comprension lectora, prediccion, vocabulario",
-    notes: "Usar texto corto y ticket de salida de 3 preguntas.",
-    status: "done",
-    reusedFrom: null,
-    objectiveCode: "LE04 OA 02",
-    curriculumUnitCode: "LE04 U1"
-  },
-  {
-    id: "cl2",
-    courseId: "c1",
-    unitId: "u1",
-    title: "Clase 2 - Inferir informacion implicita",
-    date: "2026-04-30",
-    objective:
-      "Inferir informacion implicita en un texto narrativo breve, justificando respuestas con pistas del texto.",
-    skills: "inferencia, evidencia textual",
-    notes: "Reforzar diferencia entre dato explicito e inferencia.",
-    status: "planned",
-    reusedFrom: "2025-cl-18",
-    objectiveCode: "LE04 OA 04",
-    curriculumUnitCode: "LE04 U2"
-  },
-  {
-    id: "cl3",
-    courseId: "c2",
-    unitId: "u3",
-    title: "Clase 3 - Guia de inferencias",
-    date: "2026-05-04",
-    objective:
-      "Resolver preguntas de inferencia local y global reconociendo pistas directas del texto.",
-    skills: "inferencia, comprension lectora",
-    notes: "Material reutilizado desde abril 2025.",
-    status: "planned",
-    reusedFrom: "2025-cl-33",
-    objectiveCode: "LE05 OA 06",
-    curriculumUnitCode: "LE05 U3"
-  },
-  {
-    id: "cl4",
-    courseId: "c3",
-    unitId: "u4",
-    title: "Clase 3 - Caracteristicas del mito",
-    date: "2026-05-06",
-    objective:
-      "Identificar caracteristicas del mito y explicar su funcion cultural en relatos breves.",
-    skills: "mitos, analisis literario",
-    notes: "Buscar material parecido a clase de 2025.",
-    status: "planned",
-    reusedFrom: null,
-    objectiveCode: "LE07 OA 06",
-    curriculumUnitCode: "LE07 U3"
-  }
-];
-
-const initialResources = [
-  {
-    id: "r1",
-    title: "Guia de inferencias con alternativas",
-    description: "Guia imprimible con texto narrativo y 12 preguntas de alternativa multiple.",
-    type: "guide",
-    source: "onedrive",
-    courseId: "c1",
-    unitId: "u1",
-    classId: "cl2",
-    level: "4 Basico",
-    tags: ["inferencia", "comprension lectora", "formativa"],
-    date: "2026-04-20",
-    usedCount: 3,
-    reusable: true,
-    recommended: true,
-    url: "#"
-  },
-  {
-    id: "r2",
-    title: "PPT estrategias de lectura",
-    description: "Presentacion base para modelar prediccion, subrayado y busqueda de pistas.",
-    type: "ppt",
-    source: "canvas",
-    courseId: "c1",
-    unitId: "u1",
-    classId: "cl1",
-    level: "4 Basico",
-    tags: ["prediccion", "vocabulario"],
-    date: "2026-04-18",
-    usedCount: 1,
-    reusable: true,
-    recommended: false,
-    url: "#"
-  },
-  {
-    id: "r3",
-    title: "SIMCE comprension lectora 4 basico",
-    description: "Banco corto de preguntas con alternativa multiple, dificultad media.",
-    type: "simce",
-    source: "generated",
-    courseId: "c1",
-    unitId: "u1",
-    classId: "cl2",
-    level: "4 Basico",
-    tags: ["simce", "comprension lectora", "alternativa multiple"],
-    date: "2026-04-26",
-    usedCount: 0,
-    reusable: true,
-    recommended: true,
-    url: "#"
-  },
-  {
-    id: "r4",
-    title: "Clase mitos 2025 - guia y pauta",
-    description: "Material anterior con texto de mito, preguntas de analisis y pauta.",
-    type: "guide",
-    source: "onedrive",
-    courseId: "c3",
-    unitId: "u4",
-    classId: "cl4",
-    level: "7 Basico",
-    tags: ["mitos", "analisis literario", "reutilizable"],
-    date: "2025-05-12",
-    usedCount: 2,
-    reusable: true,
-    recommended: true,
-    url: "#"
-  }
-];
-
-const labels = {
-  planned: "Planificada",
-  in_progress: "En progreso",
-  done: "Realizada",
-  archived: "Archivada",
-  guide: "Guia",
-  ppt: "PPT",
-  worksheet: "Ficha",
-  assessment: "Evaluacion",
-  simce: "SIMCE",
-  document: "Documento",
-  link: "Link",
-  video: "Video",
-  onedrive: "OneDrive",
-  canvas: "Canvas",
-  local: "Local",
-  uploaded: "Subido",
-  generated: "Generado",
-  canva: "Canva"
-};
+import { initialClasses, initialCourses, initialResources, initialUnits, labels } from "../lib/demo-data";
+import {
+  buildAssistantOutput,
+  dateKeyFromCanvaTimestamp,
+  formatDate,
+  getDemoDriveResults,
+  normalize,
+  resourceTypeFromName,
+  tagsFromName
+} from "../lib/display";
 
 const navViews = [
-  ["dashboard", "Inicio", "IN"],
-  ["courses", "Cursos", "CU"],
-  ["planner", "Planificador", "PL"],
-  ["library", "Biblioteca", "BI"],
-  ["assistant", "Asistente", "IA"],
-  ["settings", "Configuracion", "CO"]
+  ["dashboard", "Inicio", Home],
+  ["courses", "Cursos", GraduationCap],
+  ["planner", "Planificador", CalendarDays],
+  ["library", "Biblioteca", FolderOpen],
+  ["assistant", "Asistente", Bot],
+  ["settings", "Configuracion", Settings]
 ];
 
-function normalize(value) {
-  return String(value)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
-function formatDate(value) {
-  return new Intl.DateTimeFormat("es-CL", {
-    weekday: "short",
-    day: "numeric",
-    month: "short"
-  }).format(new Date(`${value}T12:00:00`));
-}
-
-function formatDateTime(value) {
-  if (!value) return "Sin fecha";
-  const date = typeof value === "number" ? new Date(value * 1000) : new Date(`${value}T12:00:00`);
-  return new Intl.DateTimeFormat("es-CL", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(date);
-}
-
-function dateKeyFromCanvaTimestamp(value) {
-  if (!value) return "";
-  return new Date(value * 1000).toISOString().slice(0, 10);
-}
-
-function formatMonthDay(value) {
-  const date = new Date(`${value}T12:00:00`);
-  return {
-    day: new Intl.DateTimeFormat("es-CL", { day: "numeric" }).format(date),
-    month: new Intl.DateTimeFormat("es-CL", { month: "short" }).format(date)
-  };
-}
-
-function resourceTypeFromName(name) {
-  const clean = normalize(name);
-  if (clean.includes("ppt") || clean.endsWith(".pptx")) return "ppt";
-  if (clean.includes("simce")) return "simce";
-  if (clean.includes("evaluacion") || clean.includes("ticket")) return "assessment";
-  if (clean.includes("guia")) return "guide";
-  return "document";
-}
-
-function tagsFromName(name) {
-  const clean = normalize(name);
-  const tags = [];
-  if (clean.includes("inferencia")) tags.push("inferencia");
-  if (clean.includes("comprension") || clean.includes("lectora")) tags.push("comprension lectora");
-  if (clean.includes("simce")) tags.push("simce");
-  if (clean.includes("mito")) tags.push("mitos");
-  return tags.length ? tags : ["onedrive"];
-}
+const emptyAssistantOutput = "Completa el formulario para crear una propuesta lista para ajustar y guardar.";
 
 function objectivesForCourse(course) {
   if (!course) return curriculumObjectives;
@@ -317,33 +80,6 @@ function objectiveByCode(code) {
   return curriculumObjectives.find((objective) => objective.code === code);
 }
 
-function getDemoDriveResults(query) {
-  const clean = normalize(query);
-  return [
-    {
-      id: "drive-1",
-      name: "Guia de inferencias 5 basico abril.docx",
-      date: "2025-04-17",
-      mime: "Word",
-      url: "#"
-    },
-    {
-      id: "drive-2",
-      name: "SIMCE comprension lectora 4 basico alternativas.pdf",
-      date: "2026-03-21",
-      mime: "PDF",
-      url: "#"
-    },
-    {
-      id: "drive-3",
-      name: "Clase 3 mitos y leyendas presentacion.pptx",
-      date: "2025-05-11",
-      mime: "PowerPoint",
-      url: "#"
-    }
-  ].filter((item) => !clean || normalize(item.name).includes(clean) || clean.includes("guia"));
-}
-
 export default function HomePage() {
   const [activeView, setActiveView] = useState("dashboard");
   const [activeCourseId, setActiveCourseId] = useState("c1");
@@ -365,9 +101,7 @@ export default function HomePage() {
   const [libraryDateTo, setLibraryDateTo] = useState("");
   const [librarySort, setLibrarySort] = useState("date_desc");
   const [quickAi, setQuickAi] = useState("Selecciona una accion para preparar material guardable en una clase.");
-  const [assistantOutput, setAssistantOutput] = useState(
-    "Completa el formulario para crear una propuesta lista para ajustar y guardar."
-  );
+  const [assistantOutput, setAssistantOutput] = useState(emptyAssistantOutput);
   const [assistantCourseId, setAssistantCourseId] = useState("c1");
   const [assistantUnitCode, setAssistantUnitCode] = useState("LE04 U1");
   const [assistantObjectiveCode, setAssistantObjectiveCode] = useState("LE04 OA 02");
@@ -609,6 +343,63 @@ export default function HomePage() {
     showToast("Proyecto Canva agregado a Biblioteca.");
   }
 
+  function generateQuickAssistant(type, topic) {
+    const course = courseById(activeCourseId);
+    const unitCode = activeClass?.courseId === activeCourseId ? activeClass.curriculumUnitCode : activeCourseUnitCode;
+    const objectiveCode =
+      activeClass?.courseId === activeCourseId ? activeClass.objectiveCode : selectedCourseUnitObjectives[0]?.code;
+    const objective =
+      curriculumObjectives.find((item) => item.code === objectiveCode) ??
+      objectivesForUnit(course, unitCode)[0] ??
+      curriculumObjectives[0];
+    const unit = curriculumUnitByCode(unitCode);
+    const output = buildAssistantOutput({ course, type, topic, objective, unit });
+
+    setAssistantCourseId(activeCourseId);
+    setAssistantUnitCode(unitCode ?? "");
+    setAssistantObjectiveCode(objective.code);
+    setQuickAi(output);
+    setAssistantOutput(output);
+    setActiveView("assistant");
+    showToast("Propuesta generada en el asistente.");
+  }
+
+  function saveAssistantOutput() {
+    if (assistantOutput === emptyAssistantOutput) {
+      showToast("Genera una propuesta antes de guardarla.");
+      return;
+    }
+
+    const course = courseById(assistantCourseId);
+    const titleLine = assistantOutput.split("\n")[0] || "Propuesta del asistente";
+    setResources((items) => [
+      {
+        id: `r-${Date.now()}`,
+        title: titleLine.slice(0, 90),
+        description: "Propuesta generada por el asistente y guardada para reutilizar en futuras clases.",
+        content: assistantOutput,
+        type: "document",
+        source: "generated",
+        courseId: assistantCourseId,
+        unitId: null,
+        classId: activeClass?.courseId === assistantCourseId ? activeClass.id : null,
+        level: course?.level ?? "Sin nivel",
+        tags: ["ia", "propuesta", "curriculum"],
+        date: new Date().toISOString().slice(0, 10),
+        usedCount: 0,
+        reusable: true,
+        recommended: true,
+        url: "#"
+      },
+      ...items
+    ]);
+    setResourceCourse(assistantCourseId);
+    setResourceSource("generated");
+    setResourceUsage("recommended");
+    setActiveView("library");
+    showToast("Propuesta guardada como recurso.");
+  }
+
   function generateAssistant(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -622,13 +413,7 @@ export default function HomePage() {
       objectivesForUnit(course, selectedUnitCode)[0] ??
       curriculumObjectives[0];
     const unit = curriculumUnitByCode(selectedUnitCode);
-    const outputs = {
-      objective: `Objetivo de clase basado en ${objective.code}\nLos estudiantes trabajaran ${topic} en ${course?.level}, desarrollando ${objective.title.toLowerCase()} y evidenciando el logro mediante respuestas justificadas.\n\nReferencia oficial: ${objective.sourceUrl}`,
-      activity: `Secuencia basada en ${objective.code}\nUnidad: ${unit?.title ?? "Sin unidad seleccionada"}\nInicio: activar conocimientos previos sobre ${topic} y explicitar el criterio de logro.\nDesarrollo: modelamiento docente, practica guiada y actividad colaborativa alineada a ${objective.title}.\nCierre: ticket breve donde cada estudiante demuestra el aprendizaje con evidencia.\n\nOA oficial: ${objective.description}`,
-      simce: `Set tipo SIMCE vinculado a ${objective.code}\n1. Pregunta de informacion explicita.\n2. Pregunta de inferencia o interpretacion.\n3. Vocabulario contextual.\n4. Proposito o efecto del texto.\n\nHabilidad foco: ${objective.skills}.`,
-      ticket: `Ticket de salida para ${objective.code}\n1. Explica una idea clave trabajada hoy.\n2. Responde una pregunta de aplicacion sobre ${topic}.\n3. Justifica tu respuesta con evidencia o criterio del OA.\n\nCriterio: ${objective.title}.`
-    };
-    setAssistantOutput(outputs[type] ?? outputs.objective);
+    setAssistantOutput(buildAssistantOutput({ course, type, topic, objective, unit }));
   }
 
   async function loadCanvasStatus() {
@@ -820,6 +605,132 @@ export default function HomePage() {
     resources
   ]);
 
+  function openWorkflowStep(stepId) {
+    if (stepId === "course" || stepId === "unit") {
+      setActiveView("courses");
+      return;
+    }
+
+    if (stepId === "class") {
+      setPlannerCourse(activeCourseId);
+      setPlannerStatus("all");
+      setActiveView("planner");
+      return;
+    }
+
+    if (stepId === "resource") {
+      setResourceCourse(activeCourseId);
+      setResourceUsage("all");
+      setActiveView("library");
+      return;
+    }
+
+    if (stepId === "assistant") {
+      setAssistantCourseId(activeCourseId);
+      setActiveView("assistant");
+      return;
+    }
+
+    setPlannerCourse(activeCourseId);
+    setPlannerStatus("planned");
+    setActiveView("planner");
+  }
+
+  function handleMissingResourceLink(resource) {
+    if (resource.source === "canva") {
+      setCanvaQuery(resource.title);
+      setResourceSource("canva");
+      setActiveView("settings");
+      showToast("Conecta o carga Canva para abrir este diseno.");
+      return;
+    }
+
+    if (resource.source === "canvas") {
+      setActiveView("settings");
+      showToast("Carga cursos Canvas para abrir este recurso.");
+      return;
+    }
+
+    if (resource.source === "onedrive") {
+      setOneDriveQuery(resource.title);
+      showToast("Este recurso no tiene enlace guardado. Busca en OneDrive para importarlo con metadata.");
+      return;
+    }
+
+    showToast("Este recurso quedo guardado en la app, pero aun no tiene archivo o enlace asociado.");
+  }
+
+  function findSimilarResources(resource) {
+    const nextQuery = resource.tags?.length ? resource.tags.slice(0, 2).join(" ") : resource.title;
+    setGlobalSearch(nextQuery);
+    setCanvaQuery(nextQuery);
+    setResourceType(resource.type);
+    setResourceSource("all");
+    setResourceUsage("all");
+    setActiveView("library");
+    showToast(`Buscando recursos parecidos a "${resource.title}".`);
+  }
+
+  const workflowSteps = [
+    {
+      id: "course",
+      title: "Curso listo",
+      detail: `${courses.length} cursos activos`,
+      action: "Revisar cursos",
+      done: courses.some((course) => course.active),
+      tone: "blue",
+      Icon: GraduationCap
+    },
+    {
+      id: "unit",
+      title: "Unidad y OA",
+      detail: selectedCourseUnit?.code ? `${selectedCourseUnit.code} conectado` : "Selecciona una unidad",
+      action: "Ver OA",
+      done: Boolean(selectedCourseUnitObjectives.length),
+      tone: "green",
+      Icon: BookOpenCheck
+    },
+    {
+      id: "class",
+      title: "Clase planificada",
+      detail: `${classes.length} clases registradas`,
+      action: "Planificar",
+      done: classes.some((item) => ["planned", "in_progress", "done"].includes(item.status)),
+      tone: "amber",
+      Icon: CalendarPlus
+    },
+    {
+      id: "resource",
+      title: "Recurso agregado",
+      detail: `${resources.length} recursos guardados`,
+      action: "Ir a biblioteca",
+      done: resources.length > 0,
+      tone: "rose",
+      Icon: Library
+    },
+    {
+      id: "assistant",
+      title: "Apoyo IA",
+      detail: assistantOutput === emptyAssistantOutput ? "Pendiente" : "Propuesta generada",
+      action: "Generar",
+      done: assistantOutput !== emptyAssistantOutput,
+      tone: "violet",
+      Icon: Sparkles
+    },
+    {
+      id: "done",
+      title: "Cierre de clase",
+      detail: `${classes.filter((item) => item.status === "done").length} realizadas`,
+      action: "Cerrar avance",
+      done: classes.some((item) => item.status === "done"),
+      tone: "sky",
+      Icon: Flag
+    }
+  ];
+  const completedWorkflowSteps = workflowSteps.filter((step) => step.done).length;
+  const nextWorkflowStep = workflowSteps.find((step) => !step.done) ?? workflowSteps[workflowSteps.length - 1];
+  const workflowProgress = Math.round((completedWorkflowSteps / workflowSteps.length) * 100);
+
   const allTags = [...new Set(resources.flatMap((resource) => resource.tags))];
   const resourceTypes = [...new Set([...resources, ...canvaLibraryItems].map((resource) => resource.type))];
   const resourceSources = [...new Set([...resources, ...canvaLibraryItems, { source: "canva" }].map((resource) => resource.source))];
@@ -838,14 +749,16 @@ export default function HomePage() {
         </div>
 
         <nav className="main-nav">
-          {navViews.map(([id, label, icon]) => (
+          {navViews.map(([id, label, Icon]) => (
             <button
               className={`nav-item ${activeView === id ? "is-active" : ""}`}
               data-view={id}
               key={id}
               onClick={() => setActiveView(id)}
             >
-              <span aria-hidden="true">{icon}</span>
+              <span aria-hidden="true">
+                <Icon size={17} />
+              </span>
               {label}
             </button>
           ))}
@@ -869,7 +782,7 @@ export default function HomePage() {
       <main className="workspace">
         <header className="topbar">
           <label className="global-search">
-            <span aria-hidden="true">⌕</span>
+            <Search size={18} aria-hidden="true" />
             <input
               type="search"
               placeholder="Buscar en recursos y Canva: guia, SIMCE, mito, abril..."
@@ -883,9 +796,11 @@ export default function HomePage() {
           </label>
           <div className="topbar-actions">
             <button className="ghost-button" onClick={() => setActiveView("library")}>
+              <FilePlus2 size={17} aria-hidden="true" />
               Nuevo recurso
             </button>
             <button className="primary-button" onClick={() => setActiveView("planner")}>
+              <PlusCircle size={17} aria-hidden="true" />
               Nueva clase
             </button>
           </div>
@@ -900,6 +815,14 @@ export default function HomePage() {
               </div>
               <div className="date-pill">Semana del 27 de abril, 2026</div>
             </div>
+
+            <WorkflowGuide
+              steps={workflowSteps}
+              completed={completedWorkflowSteps}
+              progress={workflowProgress}
+              nextStep={nextWorkflowStep}
+              onStepSelect={openWorkflowStep}
+            />
 
             <div className="dashboard-grid">
               <section className="panel today-panel">
@@ -931,13 +854,13 @@ export default function HomePage() {
                   <span className="mini-badge">OA + IA</span>
                 </div>
                 <div className="quick-ai">
-                  <button onClick={() => setQuickAi("Objetivo: inferir informacion implicita con evidencia textual.")}>
+                  <button onClick={() => generateQuickAssistant("objective", "inferencia con evidencia textual")}>
                     Crear objetivo
                   </button>
-                  <button onClick={() => setQuickAi("Inicio, desarrollo y cierre alineados al OA seleccionado.")}>
+                  <button onClick={() => generateQuickAssistant("activity", "inicio, desarrollo y cierre")}>
                     Actividad inicio-desarrollo-cierre
                   </button>
-                  <button onClick={() => setQuickAi("Set SIMCE: literal, inferencia, vocabulario y proposito.")}>
+                  <button onClick={() => generateQuickAssistant("simce", "comprension lectora tipo SIMCE")}>
                     Preguntas SIMCE
                   </button>
                 </div>
@@ -1424,7 +1347,7 @@ export default function HomePage() {
                 <label>
                   Buscar por titulo o palabra clave
                   <div className="search-field">
-                    <span aria-hidden="true">⌕</span>
+                    <Search size={16} aria-hidden="true" />
                     <input
                       type="search"
                       value={globalSearch}
@@ -1512,7 +1435,7 @@ export default function HomePage() {
                   OneDrive
                 </button>
                 <label className="onedrive-search">
-                  <span aria-hidden="true">⌕</span>
+                  <Search size={16} aria-hidden="true" />
                   <input
                     type="search"
                     placeholder="Buscar guia, PPT, SIMCE..."
@@ -1670,6 +1593,8 @@ export default function HomePage() {
                       course={courseById(resource.courseId)}
                       classItem={classes.find((item) => item.id === resource.classId)}
                       onImportCanva={importCanvaDesign}
+                      onMissingLink={handleMissingResourceLink}
+                      onFindSimilar={findSimilarResources}
                       key={resource.id}
                     />
                   ))}
@@ -1763,7 +1688,7 @@ export default function HomePage() {
               <section className="panel assistant-output">
                 <div className="panel-heading">
                   <h2>Resultado guardable</h2>
-                  <button className="ghost-button" onClick={() => showToast("Guardado en banco inteligente demo.")}>
+                  <button className="ghost-button" onClick={saveAssistantOutput}>
                     Guardar en banco
                   </button>
                 </div>
@@ -1964,171 +1889,3 @@ export default function HomePage() {
   );
 }
 
-function ClassCard({ classItem, course, unit, resourceCount, onOpen }) {
-  return (
-    <article className="class-card">
-      <div>
-        <span className="eyebrow">
-          {course?.name} · {formatDate(classItem.date)}
-        </span>
-        <h3>{classItem.title}</h3>
-        <p>{classItem.objective}</p>
-        <div className="card-meta">
-          <span>{unit?.title ?? "Sin unidad"}</span>
-          <span>{labels[classItem.status]}</span>
-          <span>{resourceCount} recursos</span>
-          <span>{classItem.curriculumUnitCode}</span>
-          <span>{classItem.objectiveCode}</span>
-        </div>
-      </div>
-      <button className="ghost-button" onClick={() => onOpen(classItem.id)}>
-        Ver clase
-      </button>
-    </article>
-  );
-}
-
-function CompactClass({ classItem, course, onOpen }) {
-  return (
-    <article className="class-card">
-      <div>
-        <h3>{classItem.title}</h3>
-        <div className="card-meta">
-          <span>{formatDate(classItem.date)}</span>
-          <span>{course?.name}</span>
-          <span>{labels[classItem.status]}</span>
-        </div>
-      </div>
-      <button className="text-button" onClick={() => onOpen(classItem.id)}>
-        Abrir
-      </button>
-    </article>
-  );
-}
-
-function PlanningCard({ classItem, course, unit, resourceCount, onOpen, onClone, onDone }) {
-  const date = formatMonthDay(classItem.date);
-  return (
-    <article className="planning-card">
-      <div className="date-box" style={{ background: course?.color }}>
-        <span>{date.month}</span>
-        <strong>{date.day}</strong>
-      </div>
-      <div>
-        <span className="eyebrow">
-          {course?.name} · {unit?.title ?? "Sin unidad"}
-        </span>
-        <h3>{classItem.title}</h3>
-        <p>{classItem.objective}</p>
-        <div className="card-meta">
-          <span className="status-pill">{labels[classItem.status]}</span>
-          <span>{resourceCount} recursos</span>
-          <span>{classItem.reusedFrom ? "Reutilizada de anos anteriores" : "Clase nueva"}</span>
-          <span>{classItem.curriculumUnitCode}</span>
-          <span>{classItem.objectiveCode}</span>
-        </div>
-      </div>
-      <div className="planning-actions">
-        <button className="ghost-button" onClick={() => onOpen(classItem.id)}>
-          Detalle
-        </button>
-        <button className="ghost-button" onClick={() => onClone(classItem.id)}>
-          Clonar
-        </button>
-        <button className="text-button" onClick={() => onDone(classItem.id)}>
-          Realizada
-        </button>
-      </div>
-    </article>
-  );
-}
-
-function ResourceMini({ resource }) {
-  return (
-    <article className="resource-card">
-      <div>
-        <h3>{resource.title}</h3>
-        <div className="card-meta">
-          <span>{labels[resource.type]}</span>
-          <span>{labels[resource.source]}</span>
-          <span>{resource.usedCount} usos</span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function ResourceCard({ resource, course, classItem, onImportCanva }) {
-  const sourceClass = `source-pill ${resource.source}`;
-  const isCanvaLiveResult = Boolean(resource.canvaDesign);
-  return (
-    <article className={`resource-card ${isCanvaLiveResult ? "canva-resource-card" : ""}`}>
-      {resource.canvaDesign?.thumbnail?.url && (
-        <img src={resource.canvaDesign.thumbnail.url} alt="" className="resource-thumb" />
-      )}
-      <div>
-        <div className="panel-heading">
-          <h3>{resource.title}</h3>
-          <span className={sourceClass}>{labels[resource.source]}</span>
-        </div>
-        <p>{resource.description}</p>
-        <div className="card-meta">
-          <span>{labels[resource.type]}</span>
-          <span>{resource.level}</span>
-          <span>{formatDateTime(resource.date)}</span>
-          <span>{course?.name ?? "Sin curso"}</span>
-          <span>{classItem ? `Usado en: ${classItem.title}` : "No usado"}</span>
-          <span>{resource.recommended ? "Recomendado para reutilizar" : "Uso normal"}</span>
-        </div>
-        <div className="tag-cloud">
-          {resource.tags.map((tag) => (
-            <span className="tag" key={tag}>
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="resource-actions">
-        {resource.url && resource.url !== "#" ? (
-          <a className="ghost-button" href={resource.url} target="_blank" rel="noreferrer">
-            {resource.source === "canva" ? "Abrir en Canva" : resource.source === "canvas" ? "Abrir en Canvas" : "Abrir"}
-          </a>
-        ) : (
-          <button className="ghost-button">
-            {resource.source === "canva" ? "Abrir en Canva" : resource.source === "canvas" ? "Abrir en Canvas" : "Abrir"}
-          </button>
-        )}
-        {isCanvaLiveResult && (
-          <button className="primary-button" onClick={() => onImportCanva?.(resource.canvaDesign)}>
-            Guardar
-          </button>
-        )}
-        <button className="ghost-button">Parecidos</button>
-      </div>
-    </article>
-  );
-}
-
-function CanvasDataList({ title, items, getLabel, getMeta }) {
-  return (
-    <section className="canvas-data-list">
-      <div className="panel-heading">
-        <h3>{title}</h3>
-        <span className="mini-badge">{items.length}</span>
-      </div>
-      <div className="stack-list compact">
-        {items.slice(0, 8).map((item) => (
-          <article className="class-card" key={item.id}>
-            <div>
-              <strong>{getLabel(item)}</strong>
-              <div className="card-meta">
-                <span>ID Canvas: {item.id}</span>
-                <span>{getMeta(item)}</span>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}

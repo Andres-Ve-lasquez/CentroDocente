@@ -270,6 +270,138 @@ h3 {
   gap: 18px;
 }
 
+.workflow-guide {
+  border: 1px solid rgba(45, 123, 232, 0.18);
+  border-radius: 24px;
+  padding: 16px;
+  margin-bottom: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 255, 0.92) 46%, rgba(255, 249, 229, 0.9)),
+    #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.workflow-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.workflow-hero h2 {
+  font-size: 1.35rem;
+  margin-bottom: 5px;
+}
+
+.workflow-hero p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.workflow-hero .primary-button,
+.workflow-step .text-button {
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.workflow-progress {
+  height: 9px;
+  border-radius: 999px;
+  margin: 15px 0;
+  overflow: hidden;
+  background: rgba(22, 32, 51, 0.08);
+}
+
+.workflow-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mint), var(--sky), var(--violet));
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workflow-step {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}
+
+.workflow-step.is-done {
+  border-color: rgba(20, 168, 132, 0.36);
+  background: rgba(244, 253, 249, 0.9);
+}
+
+.workflow-step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: var(--step-color, var(--accent));
+  box-shadow: 0 10px 22px rgba(30, 48, 84, 0.16);
+}
+
+.workflow-step-title {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.workflow-step-title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-step span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 5px;
+}
+
+.workflow-step .text-button {
+  justify-content: flex-start;
+  min-height: 28px;
+  font-size: 0.84rem;
+}
+
+.tone-blue {
+  --step-color: var(--accent);
+}
+
+.tone-green {
+  --step-color: var(--mint);
+}
+
+.tone-amber {
+  --step-color: var(--amber);
+}
+
+.tone-rose {
+  --step-color: var(--rose);
+}
+
+.tone-violet {
+  --step-color: var(--violet);
+}
+
+.tone-sky {
+  --step-color: var(--sky);
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: 22px;
@@ -1335,6 +1467,258 @@ textarea {
   border: 1px solid #dce9f8;
 }
 
+/* Modern color refresh */
+:root {
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d9e0ea;
+  --surface: #ffffff;
+  --surface-soft: #f7f9fc;
+  --nav: #17192f;
+  --nav-soft: rgba(255, 255, 255, 0.12);
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: #eaf1ff;
+  --mint: #12a37f;
+  --amber: #e8a317;
+  --rose: #e85d75;
+  --violet: #8b5cf6;
+  --sky: #0891b2;
+  --lime: #84cc16;
+  --radius-sm: 8px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --shadow: 0 18px 38px rgba(22, 32, 51, 0.08);
+  --shadow-soft: 0 8px 18px rgba(22, 32, 51, 0.06);
+}
+
+body,
+.workspace {
+  background:
+    linear-gradient(180deg, rgba(132, 204, 22, 0.08), rgba(255, 255, 255, 0) 260px),
+    linear-gradient(90deg, rgba(232, 93, 117, 0.06), rgba(37, 99, 235, 0.06) 52%, rgba(18, 163, 127, 0.06)),
+    #f6f8fb;
+}
+
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(132, 204, 22, 0.12), rgba(139, 92, 246, 0.08) 46%, rgba(8, 145, 178, 0.12)),
+    var(--nav);
+}
+
+.brand-mark,
+.workflow-step-icon,
+.date-box {
+  border-radius: 8px;
+}
+
+.brand-mark {
+  color: #111827;
+  background: linear-gradient(135deg, #fef08a, #86efac 50%, #67e8f9);
+}
+
+.nav-item {
+  border-radius: 8px;
+  color: #e8eef8;
+}
+
+.nav-item span {
+  border-radius: 8px;
+  color: #dbeafe;
+}
+
+.nav-item span svg,
+.global-search svg,
+.topbar-actions svg,
+.workflow-step-title svg {
+  flex: 0 0 auto;
+}
+
+.nav-item.is-active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.nav-item.is-active span {
+  color: #172033;
+  background: linear-gradient(135deg, #fef08a, #86efac);
+}
+
+.sync-card,
+.panel,
+.workflow-guide,
+.class-card,
+.resource-card,
+.course-card,
+.planning-card,
+.unit-selector,
+.filter-panel,
+.library-command-summary,
+.canva-library-strip,
+.integration-panel,
+.onedrive-result,
+.canva-design-card,
+.assistant-preview,
+.generated-output,
+.modal,
+.toast {
+  border-radius: 8px;
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.global-search {
+  border-radius: 8px;
+  border-color: rgba(37, 99, 235, 0.18);
+}
+
+.global-search > span {
+  display: none;
+}
+
+.topbar-actions button,
+.primary-button,
+.ghost-button,
+.text-button,
+.back-button,
+.icon-button {
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.primary-button {
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #0891b2);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
+}
+
+.primary-button:hover {
+  background: linear-gradient(135deg, #1d4ed8, #047d99);
+}
+
+.ghost-button {
+  background: #ffffff;
+  border-color: #d9e0ea;
+}
+
+.ghost-button:hover {
+  color: #111827;
+  border-color: rgba(37, 99, 235, 0.5);
+  background: #f8fbff;
+}
+
+.date-pill,
+.mini-badge,
+.tag,
+.status-pill,
+.source-pill {
+  border-radius: 999px;
+}
+
+.date-pill,
+.mini-badge {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+.tag {
+  color: #475569;
+  background: #eef2f7;
+}
+
+.status-pill {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.panel {
+  border-color: rgba(23, 32, 51, 0.08);
+  box-shadow: var(--shadow);
+}
+
+.workflow-guide {
+  border-color: rgba(37, 99, 235, 0.14);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(234, 241, 255, 0.82) 38%, rgba(236, 253, 245, 0.82)),
+    #ffffff;
+}
+
+.workflow-step {
+  border-radius: 8px;
+}
+
+.workflow-step.is-done {
+  border-color: rgba(18, 163, 127, 0.28);
+  background: #f0fdf8;
+}
+
+.workflow-progress span {
+  background: linear-gradient(90deg, var(--lime), var(--mint), var(--sky), var(--violet));
+}
+
+.ai-panel {
+  border-left: 0;
+  border-top: 4px solid var(--violet);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 243, 255, 0.92)),
+    #ffffff;
+}
+
+.course-card::before {
+  height: 6px;
+}
+
+.course-cover {
+  border-radius: 8px;
+}
+
+.class-card,
+.resource-card,
+.course-card,
+.planning-card,
+.unit-selector,
+.onedrive-result,
+.canva-design-card {
+  border-color: rgba(23, 32, 51, 0.09);
+  box-shadow: var(--shadow-soft);
+}
+
+.class-card:hover,
+.resource-card:hover,
+.course-card:hover,
+.planning-card:hover,
+.unit-selector:hover {
+  border-color: rgba(37, 99, 235, 0.38);
+  box-shadow: 0 14px 30px rgba(22, 32, 51, 0.1);
+}
+
+.quick-ai button,
+.segmented button,
+input,
+select,
+textarea,
+.search-field,
+.onedrive-search {
+  border-radius: 8px;
+}
+
+.source-pill.onedrive {
+  background: #2563eb;
+}
+
+.source-pill.canvas {
+  background: #8b5cf6;
+}
+
+.source-pill.local {
+  background: #e8a317;
+}
+
+.source-pill.generated {
+  background: #e85d75;
+}
+
 @media (max-width: 1100px) {
   h1 {
     font-size: 2rem;
@@ -1354,6 +1738,10 @@ textarea {
   .resource-card,
   .resource-card.canva-resource-card {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .planning-actions,
@@ -1420,11 +1808,20 @@ textarea {
   }
 
   .section-heading,
+  .workflow-hero,
   .class-card,
   .resource-card,
   .planning-card {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .workflow-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-hero .primary-button {
+    width: 100%;
   }
 
   .planner-layout,
@@ -1448,5 +1845,270 @@ textarea {
 
   .date-pill {
     white-space: normal;
+  }
+}
+
+/* Layout hardening */
+.workspace,
+.view,
+.panel,
+.class-card,
+.resource-card,
+.planning-card,
+.course-card,
+.workflow-guide,
+.library-command,
+.integration-panel,
+.filter-panel,
+.assistant-layout,
+.settings-grid,
+.class-detail-layout,
+.course-curriculum-layout,
+.planner-layout,
+.library-layout {
+  min-width: 0;
+}
+
+.panel-heading,
+.section-heading,
+.result-summary,
+.connector-row,
+.sync-row,
+.course-actions,
+.resource-actions,
+.planning-actions,
+.topbar-actions {
+  min-width: 0;
+}
+
+.panel-heading > *,
+.section-heading > *,
+.card-meta > *,
+.tag,
+.mini-badge,
+.date-pill,
+.status-pill,
+.source-pill {
+  min-width: 0;
+}
+
+.class-card h3,
+.resource-card h3,
+.course-card strong,
+.planning-card h3,
+.panel-heading h2,
+.panel-heading h3,
+.library-command-summary strong,
+.onedrive-result strong,
+.canva-design-card strong {
+  overflow-wrap: anywhere;
+}
+
+.card-meta span,
+.tag,
+.source-pill,
+.mini-badge,
+.status-pill {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.topbar-actions,
+.connector-actions,
+.course-actions,
+.planning-actions,
+.resource-actions {
+  align-items: stretch;
+}
+
+.primary-button,
+.ghost-button,
+.text-button,
+.back-button {
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.topbar-actions .primary-button,
+.topbar-actions .ghost-button,
+.connector-actions .primary-button,
+.connector-actions .ghost-button {
+  white-space: nowrap;
+}
+
+.workflow-steps {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.workflow-step-title strong {
+  white-space: normal;
+}
+
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+}
+
+.planning-card {
+  grid-template-columns: minmax(86px, 0.24fr) minmax(0, 1fr) minmax(170px, 0.28fr);
+}
+
+.planning-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+}
+
+.resource-card {
+  grid-template-columns: minmax(0, 1fr) minmax(132px, 0.18fr);
+}
+
+.resource-card.canva-resource-card {
+  grid-template-columns: minmax(120px, 0.2fr) minmax(0, 1fr) minmax(132px, 0.18fr);
+}
+
+.resource-card > .resource-actions {
+  width: auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+}
+
+.resource-card > .resource-actions .ghost-button,
+.resource-card > .resource-actions .primary-button,
+.resource-card > .resource-actions .text-button {
+  width: 100%;
+}
+
+.library-command {
+  grid-template-columns: minmax(220px, 0.62fr) minmax(0, 1fr);
+}
+
+.library-date-filters {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.canva-library-strip {
+  grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(150px, 0.8fr)) minmax(140px, auto);
+}
+
+.integration-panel {
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1fr);
+}
+
+.onedrive-tools {
+  grid-template-columns: minmax(100px, auto) minmax(0, 1fr) minmax(92px, auto);
+}
+
+.canvas-data-grid,
+.canva-design-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.filter-panel {
+  align-self: start;
+}
+
+.resource-thumb,
+.canva-design-thumb {
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-grid,
+  .assistant-layout,
+  .settings-grid,
+  .class-detail-layout,
+  .course-curriculum-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .planning-card,
+  .resource-card,
+  .resource-card.canva-resource-card {
+    grid-template-columns: 1fr;
+  }
+
+  .planning-actions,
+  .resource-card > .resource-actions {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planner-layout,
+  .library-layout,
+  .library-command,
+  .canva-library-strip,
+  .integration-panel,
+  .onedrive-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .view {
+    padding: 18px 12px 24px;
+  }
+
+  .panel,
+  .workflow-guide,
+  .class-card,
+  .resource-card,
+  .planning-card,
+  .course-card {
+    padding: 14px;
+  }
+
+  .topbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading,
+  .panel-heading,
+  .connector-row,
+  .onedrive-result {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .form-row,
+  .library-date-filters,
+  .planning-actions,
+  .resource-card > .resource-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .date-box {
+    min-height: 58px;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .date-box strong {
+    font-size: 1.35rem;
+  }
+
+  .toast {
+    right: 12px;
+    left: 12px;
+    max-width: none;
   }
 }
